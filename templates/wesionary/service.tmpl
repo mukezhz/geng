@@ -1,0 +1,16 @@
+package {{.PackageName}}
+
+// {{.ModuleName}}Service handles the business logic of the {{.ModuleName}} module
+type {{.ModuleName}}Service struct {
+    // Add any dependencies here
+}
+
+// New{{.ModuleName}}Service creates a new instance of {{.ModuleName}}Service
+func New{{.ModuleName}}Service() *{{.ModuleName}}Service {
+    return &{{.ModuleName}}Service{}
+}
+
+// GetMessage returns a greeting message
+func (s *{{.ModuleName}}Service) GetMessage() {{.ModuleName}}Model {
+    return {{.ModuleName}}Model{Message: "Hello World"}
+}

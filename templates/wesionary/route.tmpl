@@ -1,0 +1,18 @@
+package {{.PackageName}}
+
+import "{{.ProjectModuleName}}/pkg/framework"
+
+type {{.ModuleName}}Route struct {
+    router *framework.Router
+    controller *{{.ModuleName}}Controller
+}
+
+func New{{.ModuleName}}Route(router *framework.Router, controller *{{.ModuleName}}Controller) *{{.ModuleName}}Route {
+	route := {{.ModuleName}}Route{router: router, controller: controller}
+	route.RegisterHelloRoutes()
+	return &route
+}
+
+func (r *{{.ModuleName}}Route) RegisterHelloRoutes() {
+	r.router.GET("/", r.controller.HandleRoot)
+}
