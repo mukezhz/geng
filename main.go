@@ -51,7 +51,7 @@ func createModule(cmd *cobra.Command, args []string) {
 
 	// Define the directory structure
 	baseDir := filepath.Join(".", "domain", lowerModuleName)
-	templateDir := filepath.Join(".", "templates", "wesionary")
+	templateDir := filepath.Join(".", "templates", "wesionary", "domain", "features")
 	dir, err := os.ReadDir("domain")
 	if err != nil {
 		if !strings.Contains(err.Error(), "no such file or directory") {
@@ -68,8 +68,8 @@ func createModule(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	moduleTemplates := []string{"controller.tmpl", "service.tmpl", "model.tmpl", "route.tmpl", "module.tmpl"}
-	goFiles := []string{"controller.go", "service.go", "model.go", "route.go", "module.go"}
+	moduleTemplates := []string{"controller.tmpl", "service.tmpl", "model.tmpl", "route.tmpl", "module.tmpl", "repository.tmpl"}
+	goFiles := []string{"controller.go", "service.go", "model.go", "route.go", "module.go", "repository.go"}
 	for n, tmpl := range moduleTemplates {
 		generateFromTemplate(filepath.Join(templateDir, tmpl), filepath.Join(baseDir, goFiles[n]), data)
 	}
