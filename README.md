@@ -6,6 +6,7 @@ Fullform: `Gen`erate `G`olang Project
 - Similar to Nest CLI `geng` is command-line interface tool that helps you to initialize, develop, and maintain your Nest applications
 
 ## Installation
+- Pre-requisite: You need to install the golang in your system: [golang installation](https://go.dev/doc/install)
 ```zsh
 go install github.com/mukezhz/geng@latest
 ```
