@@ -1,15 +1,11 @@
-package hello
+package features
 
 import (
-    "go.uber.org/fx"
+  "{{.ProjectModuleName}}/domain/features/hello"
+
+  "go.uber.org/fx"
 )
 
-var Module = fx.Module("hello",
-	fx.Options(
-		fx.Provide(
-			NewHelloService,
-			NewHelloController,
-		),
-		fx.Invoke(NewHelloRoute),
-	),
+var Module = fx.Module("features",
+  fx.Options(hello.Module),
 )

@@ -1,15 +1,13 @@
 package domain
 
 import (
-    hahaha/domain/features"
-    hahaha/domain/middlewares"
-    hahaha/domain/repository"
+    "{{.ProjectModuleName}}/domain/features"
+    "{{.ProjectModuleName}}/domain/middlewares"
 
     "go.uber.org/fx"
 )
 
 var Module = fx.Options(
-	repository.Module,
 	middlewares.Module,
 	features.Module,
 )

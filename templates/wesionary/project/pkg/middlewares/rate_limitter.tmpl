@@ -11,6 +11,7 @@ import (
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
+const RateLimit = "RateLimit"
 // Global store
 // using in-memory store with goroutine which clears expired keys.
 var store = memory.NewStore()
@@ -77,7 +78,7 @@ func (lm RateLimitMiddleware) Handle(options ...Option) gin.HandlerFunc {
 			lm.logger.Panic(err.Error())
 		}
 
-		c.Set(framework.RateLimit, instance)
+		c.Set(RateLimit, instance)
 
 		// Setting custom headers
 		c.Header("X-RateLimit-Limit", strconv.FormatInt(context.Limit, 10))

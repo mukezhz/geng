@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -99,12 +100,12 @@ func createProject(cmd *cobra.Command, args []string) {
 	log.Printf("projectName: %s, projectModulename: %s", projectName, projectModuleName)
 	root := "./templates/wesionary/project"
 	targetRoot := "generated"
+	data := getModuleDataFromModuleName(projectName, projectModuleName)
 	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
 		if filepath.Ext(path) == ".tmpl" {
-			data := getModuleDataFromModuleName(projectName, projectModuleName)
 			// Create the same structure in the target directory
 			relPath, _ := filepath.Rel(root, path)
 			targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
@@ -115,11 +116,42 @@ func createProject(cmd *cobra.Command, args []string) {
 			// Generate the Go file in the target directory
 			goFile := strings.Replace(filepath.Join(targetPath, filepath.Base(path)), "tmpl", "go", 1)
 			generateFromTemplate(path, goFile, data)
+		} else {
+			// just copy the files to the target directory
+			relPath, _ := filepath.Rel(root, path)
+			targetPath := filepath.Join(targetRoot, relPath)
+
+			os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
+
+			// Copy the file
+			if err := copyFile(path, targetPath); err != nil {
+				panic(err)
+			}
 		}
 		return nil
 	})
 	return
 
+}
+
+func copyFile(src, dst string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, sourceFile)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func generateFromTemplate(templateFile, outputFile string, data ModuleData) {

@@ -6,6 +6,6 @@ import "go.uber.org/fx"
 var Module = fx.Module(
 	"middlewares",
 	fx.Options(
-		fx.Provide(NewRateLimitMiddleware),
+		fx.Provide(NewRateLimitMiddleware, NewMiddlewares),
 	),
 )
