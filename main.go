@@ -2,17 +2,22 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"fmt"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 )
+
+//go:embed templates/wesionary/*
+var templatesFS embed.FS
 
 type ModuleData struct {
 	ModuleName        string
@@ -73,7 +78,7 @@ func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleDat
 }
 
 func getModuleNameFromGoModFile() (string, error) {
-	file, err := os.Open("go.mod")
+	file, err := templatesFS.Open("go.mod")
 	if err != nil {
 		return "", err
 	}
@@ -148,48 +153,72 @@ func createProject(cmd *cobra.Command, args []string) {
 	if targetedDirectory == "" {
 		targetedDirectory = filepath.Join(targetedDirectory, projectName)
 	}
-	log.Println("Targeted Directory: ", targetedDirectory)
 	log.Printf("Project Name: %s, Project Module Name: %s", projectName, projectModuleName)
-	root := "./templates/wesionary/project"
+	//root := "./templates/wesionary/project"
 	targetRoot := targetedDirectory
 	data := getModuleDataFromModuleName(projectName, projectModuleName)
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
+	fs.WalkDir(templatesFS, "templates/wesionary/project", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() {
 			return nil
 		}
+
 		// Create the same structure in the target directory
-		relPath, _ := filepath.Rel(root, path)
+		relPath, _ := filepath.Rel("templates/wesionary/project", path)
 		targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
 		dst := filepath.Join(targetPath, filepath.Base(path))
 		os.MkdirAll(targetPath, os.ModePerm)
-		if filepath.Ext(path) == ".tmpl" {
-			// Create the directory if it does not exist
 
+		// Handle template files
+		if filepath.Ext(path) == ".tmpl" {
 			// Generate the Go file in the target directory
 			goFile := strings.Replace(dst, "tmpl", "go", 1)
-			generateFromTemplate(path, goFile, data)
-		} else if filepath.Ext(path) == ".mod" || filepath.Ext(path) == ".md" {
-			generateFromTemplate(path, dst, data)
+			generateFromEmbeddedTemplate(path, goFile, data)
 		} else {
-			if filepath.Ext(path) == ".example" {
+			// Copy or process other files as before
+			if filepath.Ext(path) == ".mod" || filepath.Ext(path) == ".md" {
+				generateFromEmbeddedTemplate(path, dst, data)
+			} else {
+				if filepath.Ext(path) == ".example" {
+					if err := copyFile(path, dst); err != nil {
+						panic(err)
+					}
+					dst = strings.Replace(dst, ".example", "", 1)
+				}
+				// just copy the files to the target directory
 				if err := copyFile(path, dst); err != nil {
 					panic(err)
 				}
-				dst = strings.Replace(dst, ".example", "", 1)
-			}
-			// just copy the files to the target directory
-			if err := copyFile(path, dst); err != nil {
-				panic(err)
 			}
 		}
 		return nil
 	})
 	return
+}
 
+func generateFromEmbeddedTemplate(path, targetFilePath string, data interface{}) {
+	tmpl, err := template.ParseFS(templatesFS, path)
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.Create(targetFilePath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	err = tmpl.Execute(file, data)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func copyFile(src, dst string) error {
-	sourceFile, err := os.Open(src)
+	sourceFile, err := templatesFS.Open(src)
 	if err != nil {
 		return err
 	}
