@@ -18,6 +18,7 @@ type ModuleData struct {
 	ModuleName        string
 	PackageName       string
 	ProjectModuleName string
+	ProjectName       string
 }
 
 var rootCmd = &cobra.Command{
@@ -55,10 +56,18 @@ func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleDat
 	lowerModuleName := strings.ToLower(moduleName)
 	c := cases.Title(language.English)
 	titleModuleName := c.String(moduleName)
+	splitedModule := strings.Split(titleModuleName, "")
+	acutalModuleName := ""
+	if len(splitedModule) > 0 {
+		acutalModuleName = strings.Join(splitedModule, "")
+	} else {
+		acutalModuleName = titleModuleName
+	}
 	data := ModuleData{
-		ModuleName:        titleModuleName,
+		ModuleName:        acutalModuleName,
 		PackageName:       lowerModuleName,
 		ProjectModuleName: projectModuleName,
+		ProjectName:       titleModuleName,
 	}
 	return data
 }

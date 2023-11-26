@@ -1,4 +1,4 @@
-# {{.ModuleName}} DOC
+# {{.ProjectName}} Documentation
 
 {{.PackageName}} with [Gin Web Framework](https://github.com/gin-gonic/gin)
 
