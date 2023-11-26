@@ -47,21 +47,21 @@ func main() {
 	}
 }
 
-func getModuleDataFromModuleName(moduleName string) ModuleData {
+func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleData {
 	lowerModuleName := strings.ToLower(moduleName)
 	c := cases.Title(language.English)
 	titleModuleName := c.String(moduleName)
 	data := ModuleData{
 		ModuleName:        titleModuleName,
 		PackageName:       lowerModuleName,
-		ProjectModuleName: "github.com/mukezhz/geng",
+		ProjectModuleName: projectModuleName,
 	}
 	return data
 }
 
 func createModule(cmd *cobra.Command, args []string) {
 	moduleName := args[1]
-	data := getModuleDataFromModuleName(moduleName)
+	data := getModuleDataFromModuleName(moduleName, "github.com/mukezhz/test")
 
 	// Define the directory structure
 	baseDir := filepath.Join(".", "domain", data.ModuleName)
@@ -104,11 +104,7 @@ func createProject(cmd *cobra.Command, args []string) {
 			return nil
 		}
 		if filepath.Ext(path) == ".tmpl" {
-			data := ModuleData{
-				ModuleName:        projectName,
-				PackageName:       projectName,
-				ProjectModuleName: projectModuleName,
-			}
+			data := getModuleDataFromModuleName(projectName, projectModuleName)
 			// Create the same structure in the target directory
 			relPath, _ := filepath.Rel(root, path)
 			targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
