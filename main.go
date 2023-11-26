@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,8 +39,7 @@ func main() {
 	}
 }
 
-func createModule(cmd *cobra.Command, args []string) {
-	moduleName := args[1]
+func getModuleDataFromModuleName(moduleName string) ModuleData {
 	lowerModuleName := strings.ToLower(moduleName)
 	c := cases.Title(language.English)
 	titleModuleName := c.String(moduleName)
@@ -48,12 +48,19 @@ func createModule(cmd *cobra.Command, args []string) {
 		PackageName:       lowerModuleName,
 		ProjectModuleName: "github.com/mukezhz/geng",
 	}
+	return data
+}
+
+func createModule(cmd *cobra.Command, args []string) {
+	moduleName := args[1]
+	data := getModuleDataFromModuleName(moduleName)
 
 	// Define the directory structure
-	baseDir := filepath.Join(".", "domain", lowerModuleName)
+	baseDir := filepath.Join(".", "domain", data.ModuleName)
 	templateDir := filepath.Join(".", "templates", "wesionary", "domain", "features")
 	dir, err := os.ReadDir("domain")
 	if err != nil {
+		// If the directory does not exist, ignore the error
 		if !strings.Contains(err.Error(), "no such file or directory") {
 			panic(err)
 		}
@@ -64,14 +71,18 @@ func createModule(cmd *cobra.Command, args []string) {
 		}
 	}
 	// Create directories
-	if err := os.Mkdir(filepath.Join(".", "domain", lowerModuleName), 0755); err != nil {
+	if err := os.Mkdir(filepath.Join(".", "domain", data.PackageName), 0755); err != nil {
+		panic(err)
+	}
+	readDir, err := os.ReadDir(templateDir)
+	if err != nil {
 		panic(err)
 	}
 
-	moduleTemplates := []string{"controller.tmpl", "service.tmpl", "model.tmpl", "route.tmpl", "module.tmpl", "repository.tmpl"}
-	goFiles := []string{"controller.go", "service.go", "model.go", "route.go", "module.go", "repository.go"}
-	for n, tmpl := range moduleTemplates {
-		generateFromTemplate(filepath.Join(templateDir, tmpl), filepath.Join(baseDir, goFiles[n]), data)
+	for _, file := range readDir {
+		log.Printf("%#v\n\n", file)
+		goFile := strings.Replace(file.Name(), "tmpl", "go", 1)
+		generateFromTemplate(filepath.Join(templateDir, file.Name()), filepath.Join(baseDir, goFile), data)
 	}
 }
 
