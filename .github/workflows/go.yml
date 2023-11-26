@@ -1,28 +1,69 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: Go
+name: Build and Release
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - 'v*'
 
 jobs:
-
   build:
+    name: Build and Release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v2
       with:
-        go-version: '1.21'
+        go-version: '^1.21'
 
-    - name: Build
-      run: go build -v ./...
+    - name: Check out code
+      uses: actions/checkout@v2
 
-    # - name: Test
-    #   run: go test -v ./...
+    - name: Build Binary for Linux
+      run: GOOS=linux GOARCH=amd64 go build -o geng-linux-amd64 .
+
+    - name: Build Binary for Windows
+      run: GOOS=windows GOARCH=amd64 go build -o geng-windows-amd64.exe .
+
+    - name: Build Binary for macOS
+      run: GOOS=darwin GOARCH=amd64 go build -o geng-darwin-amd64 .
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Linux Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./geng-linux-amd64
+        asset_name: geng-linux-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./geng-windows-amd64.exe
+        asset_name: geng-windows-amd64.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./geng-darwin-amd64
+        asset_name: geng-darwin-amd64
+        asset_content_type: application/octet-stream
