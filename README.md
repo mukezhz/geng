@@ -32,6 +32,7 @@ geng gen module <module-name>
 - [x] generate a new project
 - [x] get project module, project name and directory as command line argument
 - [x] generate a module
+- [ ] refactor the code -> make code clean
 - [ ] modify the parent features `module.go` when new module is added
 - [ ] implement CI for assets build
 - [ ] allow different template options when building project
