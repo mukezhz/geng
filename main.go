@@ -58,16 +58,18 @@ func main() {
 }
 
 func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleData {
-	lowerModuleName := strings.ToLower(moduleName)
 	c := cases.Title(language.English)
 	titleModuleName := c.String(moduleName)
-	splitedModule := strings.Split(titleModuleName, "")
+	splitedModule := strings.Split(titleModuleName, " ")
+	lowerModuleName := ""
 	acutalModuleName := ""
 	if len(splitedModule) > 0 {
 		acutalModuleName = strings.Join(splitedModule, "")
+		lowerModuleName = strings.Join(splitedModule, "_")
 	} else {
 		acutalModuleName = titleModuleName
 	}
+	lowerModuleName = strings.ToLower(lowerModuleName)
 	data := ModuleData{
 		ModuleName:        acutalModuleName,
 		PackageName:       lowerModuleName,
@@ -149,14 +151,15 @@ func createProject(cmd *cobra.Command, args []string) {
 	if projectModuleName == "" {
 		panic("project module name is required")
 	}
+	data := getModuleDataFromModuleName(projectName, projectModuleName)
 	targetedDirectory, _ := cmd.Flags().GetString("dir")
 	if targetedDirectory == "" {
-		targetedDirectory = filepath.Join(targetedDirectory, projectName)
+		targetedDirectory = filepath.Join(targetedDirectory, data.PackageName)
 	}
 	log.Printf("Project Name: %s, Project Module Name: %s", projectName, projectModuleName)
 	//root := "./templates/wesionary/project"
 	targetRoot := targetedDirectory
-	data := getModuleDataFromModuleName(projectName, projectModuleName)
+
 	fs.WalkDir(templatesFS, "templates/wesionary/project", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -180,6 +183,7 @@ func createProject(cmd *cobra.Command, args []string) {
 		} else {
 			// Copy or process other files as before
 			if filepath.Ext(path) == ".mod" || filepath.Ext(path) == ".md" {
+				dst = strings.Replace(dst, ".mod", "", 1)
 				generateFromEmbeddedTemplate(path, dst, data)
 			} else {
 				if filepath.Ext(path) == ".example" {
