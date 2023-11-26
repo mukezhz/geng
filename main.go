@@ -41,6 +41,7 @@ var newProjectCmd = &cobra.Command{
 
 func init() {
 	newProjectCmd.Flags().StringP("mod", "m", "", "features name")
+	newProjectCmd.Flags().StringP("dir", "d", "", "target directory")
 	rootCmd.AddCommand(newModuleCmd, newProjectCmd)
 }
 
@@ -131,9 +132,17 @@ func createModule(cmd *cobra.Command, args []string) {
 func createProject(cmd *cobra.Command, args []string) {
 	projectName := args[0]
 	projectModuleName, _ := cmd.Flags().GetString("mod")
-	log.Printf("projectName: %s, projectModulename: %s", projectName, projectModuleName)
+	if projectModuleName == "" {
+		panic("project module name is required")
+	}
+	targetedDirectory, _ := cmd.Flags().GetString("dir")
+	if targetedDirectory == "" {
+		targetedDirectory = filepath.Join(targetedDirectory, projectName)
+	}
+	log.Println("Targeted Directory: ", targetedDirectory)
+	log.Printf("Project Name: %s, Project Module Name: %s", projectName, projectModuleName)
 	root := "./templates/wesionary/project"
-	targetRoot := "generated"
+	targetRoot := targetedDirectory
 	data := getModuleDataFromModuleName(projectName, projectModuleName)
 	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
@@ -150,7 +159,7 @@ func createProject(cmd *cobra.Command, args []string) {
 			// Generate the Go file in the target directory
 			goFile := strings.Replace(dst, "tmpl", "go", 1)
 			generateFromTemplate(path, goFile, data)
-		} else if filepath.Ext(path) == ".mod" {
+		} else if filepath.Ext(path) == ".mod" || filepath.Ext(path) == ".md" {
 			generateFromTemplate(path, dst, data)
 		} else {
 			if filepath.Ext(path) == ".example" {

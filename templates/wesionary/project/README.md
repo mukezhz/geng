@@ -1,18 +1,18 @@
-# Yomiuri Chat API (BACKEND)
+# {{.ModuleName}} DOC
 
-Yomiuri Chat API with [Gin Web Framework](https://github.com/gin-gonic/gin)
+{{.PackageName}} with [Gin Web Framework](https://github.com/gin-gonic/gin)
 
 ## Features :star:
 
--   Yomiuri Chat written in Go
--   Application backbone with [Gin Web Framework](https://github.com/gin-gonic/gin)
--   Dependency injection using [uber-go/fx](https://pkg.go.dev/go.uber.org/fx)
--   API endpoints documentation with [Swagger-UI](https://swagger.io/tools/swagger-ui/download/)
--   Uses fully featured [GORM](https://gorm.io/index.html)
+- [x] Golang Project
+- [x] Application backbone with [Gin Web Framework](https://github.com/gin-gonic/gin)
+- [x] Dependency injection using [uber-go/fx](https://pkg.go.dev/go.uber.org/fx)
+- [ ] API endpoints documentation with [Swagger-UI](https://swagger.io/tools/swagger-ui/download/)
+- [x] Uses fully featured [GORM](https://gorm.io/index.html)
 
 ## Linter setup
 
-Need [Python3](https://www.python.org/) to setup linter in git pre-commit hook.
+- [ ] TODO: Need [Python3](https://www.python.org/) to setup linter in git pre-commit hook.
 
 ```zsh
 make lint-setup
@@ -22,15 +22,17 @@ make lint-setup
 
 ## Run application
 
--   Setup environment variables
+-   Setup environment variables **Already done for you**
 
 ```zsh
 cp .env.example .env
 ```
 
--   Update your database credentials environment variables in `.env` file
-- Setup `serviceAccountKey.json`. To get one create a firebase project. Go to Settings > Service Accounts and then click **"Generate New Private Key"**. and then confirm by clicking **"Generate Key"**.
+1. Update your database credentials environment variables in `.env` file
+2. Setup `serviceAccountKey.json`. To get one create a firebase project. Go to Settings > Service Accounts and then click **"Generate New Private Key"**. and then confirm by clicking **"Generate Key"**.
 Copy the key to `serviceAccountKey.json` file. You can see the example at `serviceAccountKey.json.example` file. 
+
+**Note:** You can skip `2nd` step if you don't want to use firebase.
 
 ### Locally
 
@@ -47,35 +49,33 @@ Copy the key to `serviceAccountKey.json` file. You can see the example at `servi
 
 ## Folder Structure :file_folder:
 
-| Folder Path                      | Description                                                                                         |
-| -------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `/api`                           | contains all the `middlwares`, `controllers` and `routes` of the server in their respective folders |
-| `/api-errors`                    | server error handlers                                                                               |
-| `/bootstrap`                     | contains modules required to start the application                                                  |
-| `/console`                       | server commands, run `go run main.go -help` for all the available server commands                   |
-| `/constants`                     | global application constants                                                                        |
-| `/docker`                        | `docker` files required for `docker compose`                                                        |
-| `/docs`                          | API endpoints documentation using `swagger`                                                         |
-| `/hooks`                         | `git` hooks                                                                                         |
-| `/infrastructure`                | third-party services connections like `gmail`, `firebase`, `s3-bucket`, ...                         |
-| `/lib`                           | contains library code                                                                               |
-| `/migration`                     | database migration files                                                                            |
-| `/models`                        | ORM models                                                                                          |
-| `/repository`                    | contains repository part of clean architecture. Mainly database queries are added here.             |
-| `/seeds`                         | seeds for already migrated tables                                                                   |
-| `/services`                      | service layers, contains the functionality that compounds the core of the application               |
-| `/tests`                         | includes application tests                                                                          |
-| `/utils`                         | global utility/helper functions                                                                     |
-| `.env.example`                   | sample environment variables                                                                        |
-| `dbconfig.yml`                   | database configuration file for `sql-migrate` command                                               |
-| `docker-compose.yml`             | `docker compose` file for service application via `Docker`                                          |
-| `main.go`                        | entry-point of the server                                                                           |
-| `Makefile`                       | stores frequently used commands; can be invoked using `make` command                                |
-| `serviceAccountKey.json.example` | sample credentials file for accessing Google Cloud                                                  |
+| Folder Path                      | Description                                                                       |
+|----------------------------------|-----------------------------------------------------------------------------------|
+| `/pkg/api-errors`                | global server error handlers                                                      |
+| `/bootstrap`                     | contains modules required to start the application                                |
+| `/console`                       | server commands, run `go run main.go -help` for all the available server commands |
+| `/constants`                     | global application constants                                                      |
+| `/docker`                        | `docker` files required for `docker compose`                                      |
+| `/docs`                          | API endpoints documentation using `swagger`                                       |
+| `/hooks`                         | `git` hooks                                                                       |
+| `/pkg`                           | contains all global `middlwares`, `infrastruture`, `framework`, `services`        |
+| `/pkg/infrastructure`            | third-party services connections like `gmail`, `firebase`, `s3-bucket`, ...       |
+| `/pkg/framework`                 | helper objects like `log manager`, `env manager` `comamnd` ...                    |
+| `/lib`                           | contains library code                                                             |
+| `/migration`                     | database migration files                                                          |
+| `/seeds`                         | seeds for already migrated tables                                                 |
+| `/tests`                         | includes application tests                                                        |
+| `/utils`                         | global utility/helper functions                                                   |
+| `.env.example`                   | sample environment variables                                                      |
+| `dbconfig.yml`                   | database configuration file for `sql-migrate` command                             |
+| `docker-compose.yml`             | `docker compose` file for service application via `Docker`                        |
+| `main.go`                        | entry-point of the server                                                         |
+| `Makefile`                       | stores frequently used commands; can be invoked using `make` command              |
+| `serviceAccountKey.json.example` | sample credentials file for accessing Google Cloud                                |
 
 ---
 
-## Migration Commands
+## TODO: Migration Commands 
 
 ⚓️ &nbsp; If you want to run the migration runner from the host environment instead of the docker environment; ensure that `sql-migrate` is installed on your local machine.
 
@@ -120,7 +120,7 @@ make p=host migrate-up
 
 ---
 
-## Testing
+## TODO: Testing
 
 The framework comes with unit and integration testing support out of the box. You can check examples written in tests directory.
 
@@ -139,7 +139,7 @@ go tool cover -html=cover.txt -o index.html
 
 ---
 
-## Checking API documents with swagger UI
+## TODO: Checking API documents with swagger UI
 
 Browse to `http://localhost:${SWAGGER_PORT}`
 
