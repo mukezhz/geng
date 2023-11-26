@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -60,9 +62,41 @@ func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleDat
 	return data
 }
 
+func getModuleNameFromGoModFile() (string, error) {
+	file, err := os.Open("go.mod")
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "module ") {
+			// Extract module name
+			parts := strings.Fields(line)
+			if len(parts) >= 2 {
+				return parts[1], nil
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	abs, _ := filepath.Abs("go.mod")
+	return "", fmt.Errorf("module directive not found in %s", abs)
+}
+
 func createModule(cmd *cobra.Command, args []string) {
+	projectModuleName, err := getModuleNameFromGoModFile()
+	if err != nil {
+		panic(err)
+	}
+
 	moduleName := args[1]
-	data := getModuleDataFromModuleName(moduleName, "github.com/mukezhz/test")
+	data := getModuleDataFromModuleName(moduleName, projectModuleName)
 
 	// Define the directory structure
 	baseDir := filepath.Join(".", "domain", data.ModuleName)
@@ -105,26 +139,28 @@ func createProject(cmd *cobra.Command, args []string) {
 		if info.IsDir() {
 			return nil
 		}
+		// Create the same structure in the target directory
+		relPath, _ := filepath.Rel(root, path)
+		targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
+		dst := filepath.Join(targetPath, filepath.Base(path))
+		os.MkdirAll(targetPath, os.ModePerm)
 		if filepath.Ext(path) == ".tmpl" {
-			// Create the same structure in the target directory
-			relPath, _ := filepath.Rel(root, path)
-			targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
-
 			// Create the directory if it does not exist
-			os.MkdirAll(targetPath, os.ModePerm)
 
 			// Generate the Go file in the target directory
-			goFile := strings.Replace(filepath.Join(targetPath, filepath.Base(path)), "tmpl", "go", 1)
+			goFile := strings.Replace(dst, "tmpl", "go", 1)
 			generateFromTemplate(path, goFile, data)
+		} else if filepath.Ext(path) == ".mod" {
+			generateFromTemplate(path, dst, data)
 		} else {
+			if filepath.Ext(path) == ".example" {
+				if err := copyFile(path, dst); err != nil {
+					panic(err)
+				}
+				dst = strings.Replace(dst, ".example", "", 1)
+			}
 			// just copy the files to the target directory
-			relPath, _ := filepath.Rel(root, path)
-			targetPath := filepath.Join(targetRoot, relPath)
-
-			os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
-
-			// Copy the file
-			if err := copyFile(path, targetPath); err != nil {
+			if err := copyFile(path, dst); err != nil {
 				panic(err)
 			}
 		}
