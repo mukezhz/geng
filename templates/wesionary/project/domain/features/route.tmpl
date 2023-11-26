@@ -1,0 +1,18 @@
+package hello
+
+import "github.com/mukezhz/test/pkg/framework"
+
+type HelloRoute struct {
+    router *framework.Router
+    controller *HelloController
+}
+
+func NewHelloRoute(router *framework.Router, controller *HelloController) *HelloRoute {
+	route := HelloRoute{router: router, controller: controller}
+	route.RegisterHelloRoutes()
+	return &route
+}
+
+func (r *HelloRoute) RegisterHelloRoutes() {
+	r.router.GET("/", r.controller.HandleRoot)
+}

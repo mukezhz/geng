@@ -23,14 +23,22 @@ var rootCmd = &cobra.Command{
 }
 
 var newModuleCmd = &cobra.Command{
-	Use:   "gen module [name]",
-	Short: "Create a new module",
+	Use:   "gen features [name]",
+	Short: "Create a new features",
 	Args:  cobra.ExactArgs(2),
 	Run:   createModule,
 }
 
+var newProjectCmd = &cobra.Command{
+	Use:   "new [project name]",
+	Short: "Create a new project",
+	Args:  cobra.ExactArgs(1),
+	Run:   createProject,
+}
+
 func init() {
-	rootCmd.AddCommand(newModuleCmd)
+	newProjectCmd.Flags().StringP("mod", "m", "", "features name")
+	rootCmd.AddCommand(newModuleCmd, newProjectCmd)
 }
 
 func main() {
@@ -57,7 +65,7 @@ func createModule(cmd *cobra.Command, args []string) {
 
 	// Define the directory structure
 	baseDir := filepath.Join(".", "domain", data.ModuleName)
-	templateDir := filepath.Join(".", "templates", "wesionary", "domain", "features")
+	templateDir := filepath.Join(".", "templates", "wesionary", "module")
 	dir, err := os.ReadDir("domain")
 	if err != nil {
 		// If the directory does not exist, ignore the error
@@ -80,10 +88,42 @@ func createModule(cmd *cobra.Command, args []string) {
 	}
 
 	for _, file := range readDir {
-		log.Printf("%#v\n\n", file)
 		goFile := strings.Replace(file.Name(), "tmpl", "go", 1)
 		generateFromTemplate(filepath.Join(templateDir, file.Name()), filepath.Join(baseDir, goFile), data)
 	}
+}
+
+func createProject(cmd *cobra.Command, args []string) {
+	projectName := args[0]
+	projectModuleName, _ := cmd.Flags().GetString("mod")
+	log.Printf("projectName: %s, projectModulename: %s", projectName, projectModuleName)
+	root := "./templates/wesionary/project"
+	targetRoot := "generated"
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".tmpl" {
+			data := ModuleData{
+				ModuleName:        projectName,
+				PackageName:       projectName,
+				ProjectModuleName: projectModuleName,
+			}
+			// Create the same structure in the target directory
+			relPath, _ := filepath.Rel(root, path)
+			targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
+
+			// Create the directory if it does not exist
+			os.MkdirAll(targetPath, os.ModePerm)
+
+			// Generate the Go file in the target directory
+			goFile := strings.Replace(filepath.Join(targetPath, filepath.Base(path)), "tmpl", "go", 1)
+			generateFromTemplate(path, goFile, data)
+		}
+		return nil
+	})
+	return
+
 }
 
 func generateFromTemplate(templateFile, outputFile string, data ModuleData) {

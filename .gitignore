@@ -55,7 +55,7 @@ go.work
 .idea/**/libraries
 
 # Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
+# When using Gradle or Maven with auto-import, you should exclude features files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
 # .idea/artifacts
@@ -113,3 +113,5 @@ fabric.properties
 !.idea/runConfigurations
 
 # End of https://www.toptal.com/developers/gitignore/api/goland+all,go
+
+generated/*
