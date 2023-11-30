@@ -155,6 +155,7 @@ func createProject(cmd *cobra.Command, args []string) {
 		panic("project module name is required")
 	}
 	goVersion, _ := cmd.Flags().GetString("version")
+	goVersion = checkVersion(goVersion)
 	data := getModuleDataFromModuleName(projectName, projectModuleName, goVersion)
 	targetedDirectory, _ := cmd.Flags().GetString("dir")
 	if targetedDirectory == "" {
@@ -255,4 +256,15 @@ func generateFromTemplate(templateFile, outputFile string, data ModuleData) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func checkVersion(goVersion string) string {
+	if goVersion == "" {
+		return goVersion
+	}
+	split := strings.Split(goVersion, ".")
+	if len(split) >= 3 {
+		return strings.Join(split[:2], ".")
+	}
+	return goVersion
 }
