@@ -36,6 +36,9 @@ go run main.go
 ```zsh
 geng gen module <module-name>
 ```
+
+**NOTE:** default supported version is of `golang 1.20`
+
 ### TODO LIST:
 - [x] generate a new project
 - [x] get project module, project name and directory as command line argument
