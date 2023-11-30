@@ -24,6 +24,14 @@ geng help
 ```zsh
 geng new <project-name> -m <project-module-name> [-d <directory>]
 ```
+- Start project
+```zsh
+cd <directory>
+cp .env.example .env
+go mod tidy
+
+go run main.go
+```
 - Generate module in already existing project
 ```zsh
 geng gen module <module-name>
@@ -36,5 +44,6 @@ geng gen module <module-name>
 - [ ] modify the parent features `module.go` when new module is added
 - [x] implement CI for assets build
 - [ ] allow different template options when building project
+- [ ] generate test case template
 
 **Thank You!!!**
