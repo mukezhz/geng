@@ -9,7 +9,7 @@ var Module = fx.Module("hello",
 		fx.Provide(
 			NewHelloService,
 			NewHelloController,
-      NewHelloRepository,
+      		NewHelloRepository,
 		),
 		fx.Invoke(NewHelloRoute),
 	),

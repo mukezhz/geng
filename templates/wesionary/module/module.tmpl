@@ -9,6 +9,7 @@ var Module = fx.Module("{{.PackageName}}",
 		fx.Provide(
 			New{{.ModuleName}}Service,
 			New{{.ModuleName}}Controller,
+			New{{.ModuleName}}Repository,
 		),
 		fx.Invoke(New{{.ModuleName}}Route),
 	),

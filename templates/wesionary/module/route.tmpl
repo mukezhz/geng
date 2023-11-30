@@ -2,18 +2,18 @@ package {{.PackageName}}
 
 import (
   "github.com/gin-gonic/gin"
-  "{{.ProjectModuleName}}/pkg/framework"
+  "{{.ProjectModuleName}}/pkg/infrastructure"
 )
 
 type {{.ModuleName}}Route struct {
-    router *framework.Router
+    router *infrastructure.Router
     controller *{{.ModuleName}}Controller
     groupRouter *gin.RouterGroup
 }
 
-func New{{.ModuleName}}Route(router *framework.Router, controller *{{.ModuleName}}Controller) *{{.ModuleName}}Route {
+func New{{.ModuleName}}Route(router *infrastructure.Router, controller *{{.ModuleName}}Controller) *{{.ModuleName}}Route {
 	route := {{.ModuleName}}Route{router: router, controller: controller}
-  route.groupRouter = router.Group("/{{.PackageName}}")
+  route.groupRouter = router.Group("api/{{.PackageName}}")
 	route.RegisterHelloRoutes()
 	return &route
 }

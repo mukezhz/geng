@@ -83,7 +83,7 @@ func getModuleDataFromModuleName(moduleName, projectModuleName, goVersion string
 }
 
 func getModuleNameFromGoModFile() (string, error) {
-	file, err := templatesFS.Open("go.mod")
+	file, err := os.Open("go.mod")
 	if err != nil {
 		return "", err
 	}
@@ -119,33 +119,10 @@ func createModule(cmd *cobra.Command, args []string) {
 	data := getModuleDataFromModuleName(moduleName, projectModuleName, "")
 
 	// Define the directory structure
-	baseDir := filepath.Join(".", "domain", data.ModuleName)
-	templateDir := filepath.Join(".", "templates", "wesionary", "module")
-	dir, err := os.ReadDir("domain")
-	if err != nil {
-		// If the directory does not exist, ignore the error
-		if !strings.Contains(err.Error(), "no such file or directory") {
-			panic(err)
-		}
-	}
-	if len(dir) == 0 {
-		if err := os.Mkdir(filepath.Join(".", "domain"), 0755); err != nil {
-			panic(err)
-		}
-	}
-	// Create directories
-	if err := os.Mkdir(filepath.Join(".", "domain", data.PackageName), 0755); err != nil {
-		panic(err)
-	}
-	readDir, err := os.ReadDir(templateDir)
-	if err != nil {
-		panic(err)
-	}
+	targetRoot := filepath.Join(".", "domain", "features", data.PackageName)
+	templatePath := filepath.Join(".", "templates", "wesionary", "module")
 
-	for _, file := range readDir {
-		goFile := strings.Replace(file.Name(), "tmpl", "go", 1)
-		generateFromTemplate(filepath.Join(templateDir, file.Name()), filepath.Join(baseDir, goFile), data)
-	}
+	generateFiles(templatePath, targetRoot, data)
 }
 
 func createProject(cmd *cobra.Command, args []string) {
@@ -165,7 +142,13 @@ func createProject(cmd *cobra.Command, args []string) {
 	//root := "./templates/wesionary/project"
 	targetRoot := targetedDirectory
 
-	fs.WalkDir(templatesFS, "templates/wesionary/project", func(path string, d fs.DirEntry, err error) error {
+	templatePath := "templates/wesionary/project"
+	generateFiles(templatePath, targetRoot, data)
+	return
+}
+
+func generateFiles(templatePath string, targetRoot string, data ModuleData) error {
+	return fs.WalkDir(templatesFS, templatePath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -175,7 +158,7 @@ func createProject(cmd *cobra.Command, args []string) {
 		}
 
 		// Create the same structure in the target directory
-		relPath, _ := filepath.Rel("templates/wesionary/project", path)
+		relPath, _ := filepath.Rel(templatePath, path)
 		targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
 		fileName := filepath.Base(path)
 		dst := filepath.Join(targetPath, fileName)
@@ -203,7 +186,6 @@ func createProject(cmd *cobra.Command, args []string) {
 		}
 		return nil
 	})
-	return
 }
 
 func generateFromEmbeddedTemplate(path, targetFilePath string, data interface{}) {
@@ -249,7 +231,6 @@ func generateFromTemplate(templateFile, outputFile string, data ModuleData) {
 	if err != nil {
 		panic(err)
 	}
-
 	file, err := os.Create(outputFile)
 	if err != nil {
 		panic(err)
