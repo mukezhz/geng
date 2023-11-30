@@ -177,7 +177,8 @@ func createProject(cmd *cobra.Command, args []string) {
 		// Create the same structure in the target directory
 		relPath, _ := filepath.Rel("templates/wesionary/project", path)
 		targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
-		dst := filepath.Join(targetPath, filepath.Base(path))
+		fileName := filepath.Base(path)
+		dst := filepath.Join(targetPath, fileName)
 		os.MkdirAll(targetPath, os.ModePerm)
 
 		// Handle template files
@@ -191,6 +192,9 @@ func createProject(cmd *cobra.Command, args []string) {
 				dst = strings.Replace(dst, ".mod", "", 1)
 				generateFromEmbeddedTemplate(path, dst, data)
 			} else {
+				if strings.HasPrefix(fileName, "hidden.") {
+					dst = strings.Replace(dst, "hidden.", ".", 1)
+				}
 				// just copy the files to the target directory
 				if err := copyFile(path, dst); err != nil {
 					panic(err)
