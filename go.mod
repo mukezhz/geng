@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/elewis787/boa v0.1.2
 	github.com/spf13/cobra v1.8.0
-	golang.org/x/text v0.13.0
+	golang.org/x/text v0.14.0
 )
 
 require (
