@@ -1,6 +1,6 @@
 module {{.ProjectModuleName}}
 
-go 1.21.1
+go {{or .GoVersion "1.20"}}
 
 require (
 	github.com/getsentry/sentry-go v0.25.0

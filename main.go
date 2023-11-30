@@ -24,6 +24,7 @@ type ModuleData struct {
 	PackageName       string
 	ProjectModuleName string
 	ProjectName       string
+	GoVersion         string
 }
 
 var rootCmd = &cobra.Command{
@@ -48,6 +49,7 @@ var newProjectCmd = &cobra.Command{
 func init() {
 	newProjectCmd.Flags().StringP("mod", "m", "", "features name")
 	newProjectCmd.Flags().StringP("dir", "d", "", "target directory")
+	newProjectCmd.Flags().StringP("version", "v", "", "version support")
 	rootCmd.AddCommand(newModuleCmd, newProjectCmd)
 }
 
@@ -57,7 +59,7 @@ func main() {
 	}
 }
 
-func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleData {
+func getModuleDataFromModuleName(moduleName, projectModuleName, goVersion string) ModuleData {
 	c := cases.Title(language.English)
 	titleModuleName := c.String(moduleName)
 	splitedModule := strings.Split(titleModuleName, " ")
@@ -75,6 +77,7 @@ func getModuleDataFromModuleName(moduleName, projectModuleName string) ModuleDat
 		PackageName:       lowerModuleName,
 		ProjectModuleName: projectModuleName,
 		ProjectName:       titleModuleName,
+		GoVersion:         goVersion,
 	}
 	return data
 }
@@ -113,7 +116,7 @@ func createModule(cmd *cobra.Command, args []string) {
 	}
 
 	moduleName := args[1]
-	data := getModuleDataFromModuleName(moduleName, projectModuleName)
+	data := getModuleDataFromModuleName(moduleName, projectModuleName, "")
 
 	// Define the directory structure
 	baseDir := filepath.Join(".", "domain", data.ModuleName)
@@ -151,7 +154,8 @@ func createProject(cmd *cobra.Command, args []string) {
 	if projectModuleName == "" {
 		panic("project module name is required")
 	}
-	data := getModuleDataFromModuleName(projectName, projectModuleName)
+	goVersion, _ := cmd.Flags().GetString("version")
+	data := getModuleDataFromModuleName(projectName, projectModuleName, goVersion)
 	targetedDirectory, _ := cmd.Flags().GetString("dir")
 	if targetedDirectory == "" {
 		targetedDirectory = filepath.Join(targetedDirectory, data.PackageName)
