@@ -186,12 +186,6 @@ func createProject(cmd *cobra.Command, args []string) {
 				dst = strings.Replace(dst, ".mod", "", 1)
 				generateFromEmbeddedTemplate(path, dst, data)
 			} else {
-				if filepath.Ext(path) == ".example" {
-					if err := copyFile(path, dst); err != nil {
-						panic(err)
-					}
-					dst = strings.Replace(dst, ".example", "", 1)
-				}
 				// just copy the files to the target directory
 				if err := copyFile(path, dst); err != nil {
 					panic(err)
