@@ -3,7 +3,7 @@
 Fullform: `Gen`erate `G`olang Project
 
 ## Introduction
-- Similar to Nest CLI `geng` is command-line interface tool that helps you to initialize, develop, and maintain your Nest applications
+- Inspired by Nest CLI `geng` is command-line interface tool that helps you to initialize, develop, and maintain your Go gin applications
 - By default it will generate the clean code architecture of [wesionaryTEAM](https://github.com/wesionaryTEAM/go_clean_architecture)
 
 ## Installation
