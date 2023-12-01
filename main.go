@@ -80,18 +80,6 @@ func init() {
 }
 
 func main() {
-	color.Cyanln(`
-    GENG: GENERATE GOLANG PROJECT
-
- ██████╗ ███████╗███╗   ██╗       ██████╗ 
-██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
-██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
-██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
-╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
- ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
-                                          
-
-`)
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -197,11 +185,11 @@ func createProject(cmd *cobra.Command, args []string) {
 
 	if len(args) == 0 {
 		questions := []terminal.ProjectQuestion{
-			terminal.NewShortQuestion(ProjectNameKEY, ProjectName, "Enter Project Name:"),
-			terminal.NewShortQuestion(ProjectModuleNameKEY, ProjectModuleName, "Enter Module Name:"),
-			terminal.NewShortQuestion(AuthorKEY, Author, "Enter Author Detail[Example: Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
-			terminal.NewLongQuestion(ProjectDescriptionKEY, ProjectDescription, "Enter Project Description [Optional]"),
-			terminal.NewShortQuestion(GoVersionKEY, GoVersion, "Enter Go Version (Default: 1.20) [Optional]"),
+			terminal.NewShortQuestion(ProjectNameKEY, ProjectName+" *", "Enter Project Name:"),
+			terminal.NewShortQuestion(ProjectModuleNameKEY, ProjectModuleName+" *", "Enter Module Name:"),
+			terminal.NewShortQuestion(AuthorKEY, Author+" [Optional]", "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
+			terminal.NewLongQuestion(ProjectDescriptionKEY, ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
+			terminal.NewShortQuestion(GoVersionKEY, GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
 		}
 		terminal.StartInteractiveTerminal(questions)
 
@@ -263,27 +251,41 @@ func createProject(cmd *cobra.Command, args []string) {
 }
 
 func PrintColorizeProjectDetail(data ModuleData) {
-	color.Cyanf("\t%-20s: %-15s\n", ProjectName, data.ProjectName)
-	color.Cyanf("\t%-20s: %-15s\n", ProjectModuleName, data.ProjectModuleName)
-	color.Cyanf("\t%-20s: %-15s\n", ProjectDescription, data.ProjectDescription)
-	color.Cyanf("\t%-20s: %-15s\n", GoVersion, data.GoVersion)
-	color.Cyanf("\t%-20s: %-15s\n", Author, data.Author)
-
+	color.Cyanln(`
+	    GENG: GENERATE GOLANG PROJECT
+	
+	 ██████╗ ███████╗███╗   ██╗       ██████╗ 
+	██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
+	██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
+	██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
+	╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
+	 ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
+											  
+	
+	`)
+	color.Greenln("\tThe information you have provided:\n")
+	color.Cyanf("\t%-20s💻: %-15s\n", ProjectName, data.ProjectName)
+	color.Cyanf("\t%-20s📂: %-15s\n", ProjectModuleName, data.ProjectModuleName)
+	color.Cyanf("\t%-20s📚: %-15s\n", ProjectDescription, data.ProjectDescription)
+	color.Cyanf("\t%-20s🆚: %-15s\n", GoVersion, data.GoVersion)
+	color.Cyanf("\t%-20s🤓: %-15s\n", Author, data.Author)
 	PrintFinalStepAfterProjectInitialization(data)
+	color.Redln("\n\tThank You For using 🙏🇳🇵:\n")
+
 }
 
 func PrintFinalStepAfterProjectInitialization(data ModuleData) {
 	output := fmt.Sprintf(`
-	Change directory to project:
+	Change directory to project 💻:
 	    cd %v
 
-	Sync dependencies:
+	📚 Sync dependencies :
 	    go mod tidy
 	
-	Copy .env.example to .env:
+	🕵 Copy .env.example to .env:
 	    cp .env.example .env
 	
-	Start Project:
+	🏃 Start Project 🏃:
 	    go run main.go app:serve
 `, data.PackageName)
 	color.Yellowf(output)
