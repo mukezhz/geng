@@ -49,4 +49,8 @@ geng gen module <module-name>
 - [ ] allow different template options when building project
 - [ ] generate test case template
 
+### Diagrams
+![image](https://github.com/mukezhz/geng/assets/43813670/902f4f63-8c09-4c15-b27f-fe99a222a912)
+
+
 **Thank You!!!**
