@@ -30,6 +30,7 @@ const (
 	AuthorKEY             = "author"
 	ProjectDescriptionKEY = "projectDescription"
 	GoVersionKEY          = "goVersion"
+	DirectoryKEY          = "directory"
 )
 const (
 	ProjectName        = "Project Name"
@@ -37,6 +38,7 @@ const (
 	Author             = "Author Detail"
 	ProjectDescription = "Project Description"
 	GoVersion          = "Go Version"
+	Directory          = "Project Directory"
 )
 
 //go:embed templates/wesionary/*
@@ -182,6 +184,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	var goVersion string
 	var projectDescription string
 	var author string
+	var directory string
 
 	if len(args) == 0 {
 		questions := []terminal.ProjectQuestion{
@@ -190,6 +193,7 @@ func createProject(cmd *cobra.Command, args []string) {
 			terminal.NewShortQuestion(AuthorKEY, Author+" [Optional]", "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
 			terminal.NewLongQuestion(ProjectDescriptionKEY, ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
 			terminal.NewShortQuestion(GoVersionKEY, GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
+			terminal.NewShortQuestion(DirectoryKEY, Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
 		}
 		terminal.StartInteractiveTerminal(questions)
 
@@ -210,12 +214,15 @@ func createProject(cmd *cobra.Command, args []string) {
 			case GoVersionKEY:
 				goVersion = q.Answer
 				break
+			case DirectoryKEY:
+				directory = q.Answer
 			}
 		}
 	} else {
 		projectName = args[0]
 		projectModuleName, _ = cmd.Flags().GetString("mod")
 		goVersion, _ = cmd.Flags().GetString("version")
+		directory, _ = cmd.Flags().GetString("dir")
 	}
 
 	goVersion = checkVersion(goVersion)
@@ -232,7 +239,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	data.ProjectDescription = projectDescription
 	data.Author = author
 
-	data.Directory, _ = cmd.Flags().GetString("dir")
+	data.Directory = directory
 	if data.Directory == "" {
 		data.Directory = filepath.Join(data.Directory, data.PackageName)
 	}
