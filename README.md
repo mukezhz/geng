@@ -24,6 +24,10 @@ geng help
 ```zsh
 geng new <project-name> -m <project-module-name> [-d <directory>]
 ```
+- Use Interactive to create new project
+```zsh
+geng new
+```
 - Start project
 ```zsh
 cd <directory>
