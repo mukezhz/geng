@@ -73,16 +73,9 @@ func (m *Model) Next() {
 }
 
 func StartInteractiveTerminal(questions []ProjectQuestion) {
-	// init styles; optional, just showing as a way to organize styles
-	// start bubble tea and init first model
 	m := New(questions)
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
-
-//func main() {
-//	questions := []ProjectQuestion{NewShortQuestion("ProjectQuestion Name?"), NewLongQuestion("ProjectQuestion Description?"), NewShortQuestion("Go Version?")}
-//	startInteractiveTerminal(questions)
-//}

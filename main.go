@@ -50,6 +50,7 @@ type ModuleData struct {
 	GoVersion          string
 	ProjectDescription string
 	Author             string
+	Directory          string
 }
 
 var rootCmd = &cobra.Command{
@@ -80,7 +81,7 @@ func init() {
 
 func main() {
 	color.Cyanln(`
-    GENG: GNERATE GOLANG PROJECT
+    GENG: GENERATE GOLANG PROJECT
 
  ██████╗ ███████╗███╗   ██╗       ██████╗ 
 ██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
@@ -124,7 +125,12 @@ func getModuleNameFromGoModFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(file)
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -146,11 +152,12 @@ func getModuleNameFromGoModFile() (string, error) {
 	return "", fmt.Errorf("module directive not found in %s", abs)
 }
 
-func createModule(cmd *cobra.Command, args []string) {
+func createModule(_ *cobra.Command, args []string) {
 	projectModuleName, err := getModuleNameFromGoModFile()
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		color.Redln("Error getting current directory:", err)
+		panic(err)
 		return
 	}
 	projectPath, err := findGitRoot(currentDir)
@@ -170,7 +177,11 @@ func createModule(cmd *cobra.Command, args []string) {
 	targetRoot := filepath.Join(".", "domain", "features", data.PackageName)
 	templatePath := filepath.Join(".", "templates", "wesionary", "module")
 
-	generateFiles(templatePath, targetRoot, data)
+	err = generateFiles(templatePath, targetRoot, data)
+	if err != nil {
+		color.Redln("Error: generate file", err)
+		return
+	}
 
 	updatedCode := AddAnotherFxOptionsInModule(mainModulePath, data.PackageName, data.ProjectModuleName)
 	writeContentToPath(mainModulePath, updatedCode)
@@ -233,24 +244,50 @@ func createProject(cmd *cobra.Command, args []string) {
 	data.ProjectDescription = projectDescription
 	data.Author = author
 
-	targetedDirectory, _ := cmd.Flags().GetString("dir")
-	if targetedDirectory == "" {
-		targetedDirectory = filepath.Join(targetedDirectory, data.PackageName)
+	data.Directory, _ = cmd.Flags().GetString("dir")
+	if data.Directory == "" {
+		data.Directory = filepath.Join(data.Directory, data.PackageName)
 	}
-	targetRoot := targetedDirectory
+	targetRoot := data.Directory
 
 	templatePath := filepath.Join("templates", "wesionary", "project")
-	generateFiles(templatePath, targetRoot, data)
+	err := generateFiles(templatePath, targetRoot, data)
+	if err != nil {
+		color.Redln("Error generate file", err)
+		return
+	}
 
-	color.Greenf("%-20s: %-15s\n", ProjectName, data.ProjectName)
-	color.Greenf("%-20s: %-15s\n", ProjectModuleName, data.ProjectModuleName)
-	color.Greenf("%-20s: %-15s\n", ProjectDescription, data.ProjectDescription)
-	color.Greenf("%-20s: %-15s\n", GoVersion, data.GoVersion)
-	color.Greenf("%-20s: %-15s\n", Author, data.Author)
-
+	PrintColorizeProjectDetail(data)
+	fmt.Println("\n")
 	return
 }
 
+func PrintColorizeProjectDetail(data ModuleData) {
+	color.Cyanf("\t%-20s: %-15s\n", ProjectName, data.ProjectName)
+	color.Cyanf("\t%-20s: %-15s\n", ProjectModuleName, data.ProjectModuleName)
+	color.Cyanf("\t%-20s: %-15s\n", ProjectDescription, data.ProjectDescription)
+	color.Cyanf("\t%-20s: %-15s\n", GoVersion, data.GoVersion)
+	color.Cyanf("\t%-20s: %-15s\n", Author, data.Author)
+
+	PrintFinalStepAfterProjectInitialization(data)
+}
+
+func PrintFinalStepAfterProjectInitialization(data ModuleData) {
+	output := fmt.Sprintf(`
+	Change directory to project:
+	    cd %v
+
+	Sync dependencies:
+	    go mod tidy
+	
+	Copy .env.example to .env:
+	    cp .env.example .env
+	
+	Start Project:
+	    go run main.go app:serve
+`, data.PackageName)
+	color.Yellowf(output)
+}
 func generateFiles(templatePath string, targetRoot string, data ModuleData) error {
 	return fs.WalkDir(templatesFS, templatePath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -266,7 +303,11 @@ func generateFiles(templatePath string, targetRoot string, data ModuleData) erro
 		targetPath := filepath.Join(targetRoot, filepath.Dir(relPath))
 		fileName := filepath.Base(path)
 		dst := filepath.Join(targetPath, fileName)
-		os.MkdirAll(targetPath, os.ModePerm)
+		err = os.MkdirAll(targetPath, os.ModePerm)
+		if err != nil {
+			color.Redln("Error make dir", err)
+			return err
+		}
 
 		// Handle template files
 		if filepath.Ext(path) == ".tmpl" {
@@ -302,7 +343,12 @@ func generateFromEmbeddedTemplate(path, targetFilePath string, data interface{})
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			color.Println("Error closing", err)
+		}
+	}(file)
 
 	err = tmpl.Execute(file, data)
 	if err != nil {
@@ -315,13 +361,23 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	defer sourceFile.Close()
+	defer func(sourceFile fs.File) {
+		err := sourceFile.Close()
+		if err != nil {
+			color.Redln("Error closing:", err)
+		}
+	}(sourceFile)
 
 	destFile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
-	defer destFile.Close()
+	defer func(destFile *os.File) {
+		err := destFile.Close()
+		if err != nil {
+			color.Redln("Error closing:", err)
+		}
+	}(destFile)
 
 	_, err = io.Copy(destFile, sourceFile)
 	if err != nil {
@@ -339,7 +395,12 @@ func generateFromTemplate(templateFile, outputFile string, data ModuleData) {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			color.Redln("Error closing:", err)
+		}
+	}(file)
 
 	err = tmpl.Execute(file, data)
 	if err != nil {
