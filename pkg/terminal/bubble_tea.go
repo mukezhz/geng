@@ -20,7 +20,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
+		case "ctrl+c", tea.KeyEsc.String(), tea.KeyEscape.String():
+			return m, tea.Quit
+		case tea.KeyEsc.String():
 			return m, tea.Quit
 		case "enter":
 			if m.index == len(m.questions)-1 {

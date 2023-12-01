@@ -197,11 +197,11 @@ func createProject(cmd *cobra.Command, args []string) {
 
 	if len(args) == 0 {
 		questions := []terminal.ProjectQuestion{
-			terminal.NewShortQuestion(ProjectNameKEY, ProjectName, "Enter Project Name"),
-			terminal.NewShortQuestion(ProjectModuleNameKEY, ProjectModuleName, "Enter Module Name"),
-			terminal.NewShortQuestion(AuthorKEY, Author, "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>]"),
-			terminal.NewLongQuestion(ProjectDescriptionKEY, ProjectDescription, "Enter Project Description"),
-			terminal.NewShortQuestion(GoVersionKEY, GoVersion, "Enter Go Version[Default: 1.20]"),
+			terminal.NewShortQuestion(ProjectNameKEY, ProjectName, "Enter Project Name:"),
+			terminal.NewShortQuestion(ProjectModuleNameKEY, ProjectModuleName, "Enter Module Name:"),
+			terminal.NewShortQuestion(AuthorKEY, Author, "Enter Author Detail[Example: Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
+			terminal.NewLongQuestion(ProjectDescriptionKEY, ProjectDescription, "Enter Project Description [Optional]"),
+			terminal.NewShortQuestion(GoVersionKEY, GoVersion, "Enter Go Version (Default: 1.20) [Optional]"),
 		}
 		terminal.StartInteractiveTerminal(questions)
 
