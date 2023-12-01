@@ -32,6 +32,7 @@ const (
 	GoVersionKEY          = "goVersion"
 	DirectoryKEY          = "directory"
 )
+
 const (
 	ProjectName        = "Project Name"
 	ProjectModuleName  = "Project Module"
@@ -216,6 +217,7 @@ func createProject(cmd *cobra.Command, args []string) {
 				break
 			case DirectoryKEY:
 				directory = q.Answer
+				break
 			}
 		}
 	} else {
@@ -294,9 +296,10 @@ func PrintFinalStepAfterProjectInitialization(data ModuleData) {
 	
 	🏃 Start Project 🏃:
 	    go run main.go app:serve
-`, data.PackageName)
+`, data.Directory)
 	color.Yellowf(output)
 }
+
 func generateFiles(templatePath string, targetRoot string, data ModuleData) error {
 	return fs.WalkDir(templatesFS, templatePath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
