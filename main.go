@@ -270,16 +270,16 @@ func PrintColorizeProjectDetail(data ModuleData) {
 	color.Cyanf("\t%-20s🆚: %-15s\n", GoVersion, data.GoVersion)
 	color.Cyanf("\t%-20s🤓: %-15s\n", Author, data.Author)
 	PrintFinalStepAfterProjectInitialization(data)
-	color.Redln("\n\tThank You For using 🙏🇳🇵:\n")
+	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
 
 }
 
 func PrintFinalStepAfterProjectInitialization(data ModuleData) {
 	output := fmt.Sprintf(`
-	Change directory to project 💻:
+	💻 Change directory to project:
 	    cd %v
 
-	📚 Sync dependencies :
+	📚 Sync dependencies:
 	    go mod tidy
 	
 	🕵 Copy .env.example to .env:
