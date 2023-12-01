@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"github.com/gookit/color"
+	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/spf13/cobra"
 	"go/ast"
 	"go/format"
@@ -14,22 +16,40 @@ import (
 	"golang.org/x/text/language"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
+	"unicode"
+)
+
+const (
+	ProjectNameKEY        = "projectName"
+	ProjectModuleNameKEY  = "projectModuleName"
+	AuthorKEY             = "author"
+	ProjectDescriptionKEY = "projectDescription"
+	GoVersionKEY          = "goVersion"
+)
+const (
+	ProjectName        = "Project Name"
+	ProjectModuleName  = "Project Module"
+	Author             = "Author Detail"
+	ProjectDescription = "Project Description"
+	GoVersion          = "Go Version"
 )
 
 //go:embed templates/wesionary/*
 var templatesFS embed.FS
 
 type ModuleData struct {
-	ModuleName        string
-	PackageName       string
-	ProjectModuleName string
-	ProjectName       string
-	GoVersion         string
+	ModuleName         string
+	PackageName        string
+	ProjectModuleName  string
+	ProjectName        string
+	GoVersion          string
+	ProjectDescription string
+	Author             string
 }
 
 var rootCmd = &cobra.Command{
@@ -47,7 +67,7 @@ var newModuleCmd = &cobra.Command{
 var newProjectCmd = &cobra.Command{
 	Use:   "new [project name]",
 	Short: "Create a new project",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	Run:   createProject,
 }
 
@@ -59,6 +79,18 @@ func init() {
 }
 
 func main() {
+	color.Cyanln(`
+    GENG: GNERATE GOLANG PROJECT
+
+ ██████╗ ███████╗███╗   ██╗       ██████╗ 
+██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
+██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
+██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
+╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
+ ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
+                                          
+
+`)
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -146,24 +178,76 @@ func createModule(cmd *cobra.Command, args []string) {
 }
 
 func createProject(cmd *cobra.Command, args []string) {
-	projectName := args[0]
-	projectModuleName, _ := cmd.Flags().GetString("mod")
-	if projectModuleName == "" {
-		panic("project module name is required")
+	var projectName string
+	var projectModuleName string
+	var goVersion string
+	var projectDescription string
+	var author string
+
+	if len(args) == 0 {
+		questions := []terminal.ProjectQuestion{
+			terminal.NewShortQuestion(ProjectNameKEY, ProjectName, "Enter Project Name"),
+			terminal.NewShortQuestion(ProjectModuleNameKEY, ProjectModuleName, "Enter Module Name"),
+			terminal.NewShortQuestion(AuthorKEY, Author, "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>]"),
+			terminal.NewLongQuestion(ProjectDescriptionKEY, ProjectDescription, "Enter Project Description"),
+			terminal.NewShortQuestion(GoVersionKEY, GoVersion, "Enter Go Version[Default: 1.20]"),
+		}
+		terminal.StartInteractiveTerminal(questions)
+
+		for _, q := range questions {
+			switch q.Key {
+			case ProjectNameKEY:
+				projectName = q.Answer
+				break
+			case ProjectDescriptionKEY:
+				projectDescription = q.Answer
+				break
+			case AuthorKEY:
+				author = q.Answer
+				break
+			case ProjectModuleNameKEY:
+				projectModuleName = q.Answer
+				break
+			case GoVersionKEY:
+				goVersion = q.Answer
+				break
+			}
+		}
+	} else {
+		projectName = args[0]
+		projectModuleName, _ = cmd.Flags().GetString("mod")
+		goVersion, _ = cmd.Flags().GetString("version")
 	}
-	goVersion, _ := cmd.Flags().GetString("version")
+
 	goVersion = checkVersion(goVersion)
+	if projectName == "" {
+		color.Redln("Error: project name is required")
+		return
+	}
+	if projectModuleName == "" {
+		color.Redln("Error: module name is required")
+		return
+	}
+
 	data := getModuleDataFromModuleName(projectName, projectModuleName, goVersion)
+	data.ProjectDescription = projectDescription
+	data.Author = author
+
 	targetedDirectory, _ := cmd.Flags().GetString("dir")
 	if targetedDirectory == "" {
 		targetedDirectory = filepath.Join(targetedDirectory, data.PackageName)
 	}
-	log.Printf("Project Name: %s, Project Module Name: %s", projectName, projectModuleName)
-	//root := "./templates/wesionary/project"
 	targetRoot := targetedDirectory
 
-	templatePath := "templates/wesionary/project"
+	templatePath := filepath.Join("templates", "wesionary", "project")
 	generateFiles(templatePath, targetRoot, data)
+
+	color.Greenf("%-20s: %-15s\n", ProjectName, data.ProjectName)
+	color.Greenf("%-20s: %-15s\n", ProjectModuleName, data.ProjectModuleName)
+	color.Greenf("%-20s: %-15s\n", ProjectDescription, data.ProjectDescription)
+	color.Greenf("%-20s: %-15s\n", GoVersion, data.GoVersion)
+	color.Greenf("%-20s: %-15s\n", Author, data.Author)
+
 	return
 }
 
@@ -264,8 +348,12 @@ func generateFromTemplate(templateFile, outputFile string, data ModuleData) {
 }
 
 func checkVersion(goVersion string) string {
+	versionRegex := regexp.MustCompile(`^\d+\.\d+(\.\d+)?$`)
 	if goVersion == "" {
-		return goVersion
+		return "1.20"
+	}
+	if !versionRegex.MatchString(goVersion) {
+		return "error"
 	}
 	split := strings.Split(goVersion, ".")
 	if len(split) >= 3 {
@@ -274,11 +362,28 @@ func checkVersion(goVersion string) string {
 	return goVersion
 }
 
+func checkGolangIdentifier(identifier string) bool {
+	if identifier == "" {
+		return false
+	}
+
+	for i, r := range identifier {
+		if i == 0 && !unicode.IsLetter(r) && r != '_' {
+			return false
+		}
+		if i > 0 && !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
+			return false
+		}
+	}
+
+	return true
+}
+
 func AddAnotherFxOptionsInModule(path, module, projectModule string) string {
 	fset := token.NewFileSet()
 	node, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	importPackage(node, projectModule, module)
 
@@ -306,7 +411,7 @@ func AddAnotherFxOptionsInModule(path, module, projectModule string) string {
 	// Add the source code in buffer
 	var buf bytes.Buffer
 	if err := format.Node(&buf, fset, node); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	formattedCode := buf.String()
 	providerToInsert := fmt.Sprintf("fx.Options(%v.Module),", module)
@@ -338,10 +443,11 @@ func writeContentToPath(path, content string) {
 }
 
 func importPackage(node *ast.File, projectModule, packageName string) {
+	path := filepath.Join(projectModule, "domain", "features", packageName)
 	importSpec := &ast.ImportSpec{
 		Path: &ast.BasicLit{
 			Kind:  token.STRING,
-			Value: fmt.Sprintf(`"%v/domain/features/%v"`, projectModule, packageName),
+			Value: fmt.Sprintf(`"%v"`, path),
 		},
 	}
 
