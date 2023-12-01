@@ -2,7 +2,7 @@
 
 {{.PackageName}} with [Gin Web Framework](https://github.com/gin-gonic/gin)
 
-Author: {{.Author}}
+Author: {{or .Author "TODO: Full Name <email>"}}
 
 ### Description
 {{or .ProjectDescription "TODO: Add description"}}
