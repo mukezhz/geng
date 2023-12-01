@@ -2,6 +2,11 @@
 
 {{.PackageName}} with [Gin Web Framework](https://github.com/gin-gonic/gin)
 
+Author: {{.Author}}
+
+### Description
+{{or .ProjectDescription "TODO: Add description"}}
+
 ## Features :star:
 
 - [x] Golang Project
