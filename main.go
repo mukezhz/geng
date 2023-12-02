@@ -339,6 +339,9 @@ func PrintFinalStepAfterProjectInitialization(data ModuleData) {
 	output := fmt.Sprintf(`
 	💻 Change directory to project:
 	    cd %v
+	
+	💾 Initalize git repository:
+	    git init
 
 	📚 Sync dependencies:
 	    go mod tidy
