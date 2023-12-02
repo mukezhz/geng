@@ -56,6 +56,11 @@ type ModuleData struct {
 	Directory          string
 }
 
+type GoMod struct {
+	Module    string
+	GoVersion string
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "geng",
 	Short: "Go Generate[geng] is a tool for generating Go modules",
@@ -111,10 +116,12 @@ func getModuleDataFromModuleName(moduleName, projectModuleName, goVersion string
 	return data
 }
 
-func getModuleNameFromGoModFile() (string, error) {
+func getModuleNameFromGoModFile() (GoMod, error) {
 	file, err := os.Open("go.mod")
+	goMod := GoMod{}
+
 	if err != nil {
-		return "", err
+		return goMod, err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -130,21 +137,27 @@ func getModuleNameFromGoModFile() (string, error) {
 			// Extract module name
 			parts := strings.Fields(line)
 			if len(parts) >= 2 {
-				return parts[1], nil
+				goMod.Module = parts[1]
+			}
+		} else if strings.HasPrefix(line, "go ") {
+			// Extract Go version
+			parts := strings.Fields(line)
+			if len(parts) >= 2 {
+				goMod.GoVersion = parts[1]
 			}
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return "", err
+		return goMod, err
 	}
 
 	abs, _ := filepath.Abs("go.mod")
-	return "", fmt.Errorf("module directive not found in %s", abs)
+	return goMod, fmt.Errorf("module directive not found in %s", abs)
 }
 
 func createModule(_ *cobra.Command, args []string) {
-	projectModuleName, err := getModuleNameFromGoModFile()
+	projectModule, err := getModuleNameFromGoModFile()
 	currentDir, err := os.Getwd()
 	if err != nil {
 		color.Redln("Error getting current directory:", err)
@@ -162,7 +175,11 @@ func createModule(_ *cobra.Command, args []string) {
 	}
 
 	moduleName := args[1]
-	data := getModuleDataFromModuleName(moduleName, projectModuleName, "")
+	if !checkGolangIdentifier(moduleName) {
+		color.Redln("Error: module name is invalid")
+		return
+	}
+	data := getModuleDataFromModuleName(moduleName, projectModule.Module, projectModule.GoVersion)
 
 	// Define the directory structure
 	targetRoot := filepath.Join(".", "domain", "features", data.PackageName)
@@ -176,6 +193,8 @@ func createModule(_ *cobra.Command, args []string) {
 
 	updatedCode := AddAnotherFxOptionsInModule(mainModulePath, data.PackageName, data.ProjectModuleName)
 	writeContentToPath(mainModulePath, updatedCode)
+
+	PrintColorizeModuleDetail(data)
 
 }
 
@@ -281,6 +300,39 @@ func PrintColorizeProjectDetail(data ModuleData) {
 	PrintFinalStepAfterProjectInitialization(data)
 	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
 
+}
+func PrintColorizeModuleDetail(data ModuleData) {
+	color.Cyanln(`
+	    GENG: GENERATE GOLANG MODULE
+	
+	 ██████╗ ███████╗███╗   ██╗       ██████╗ 
+	██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
+	██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
+	██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
+	╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
+	 ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
+											  
+	
+	`)
+	color.Greenln("\tThe information you have provided:\n")
+	color.Cyanf("\t%-20s💻: %-15s\n", ProjectName, data.ProjectName)
+	color.Cyanf("\t%-20s📂: %-15s\n", ProjectModuleName, data.ProjectModuleName)
+	color.Cyanf("\t%-20s🆚: %-15s\n", GoVersion, data.GoVersion)
+	PrintFinalStepAfterModuleInitialization(data)
+	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
+}
+
+func PrintFinalStepAfterModuleInitialization(data ModuleData) {
+	output := fmt.Sprintf(`
+	🎉 Successfully created module %v
+
+	↪️ Restart the server to see the changes:
+
+	🌐 Navigate to the following path:
+	    %v
+
+`, data.ModuleName, "/api/"+data.PackageName)
+	color.Yellowf(output)
 }
 
 func PrintFinalStepAfterProjectInitialization(data ModuleData) {
