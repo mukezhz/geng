@@ -38,6 +38,7 @@ go run main.go
 ```
 - Generate module in already existing project
 ```zsh
+// Project needs to initialize git repository to work module generation
 geng gen module <module-name>
 ```
 
