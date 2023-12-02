@@ -49,11 +49,14 @@ func main() {
 
 func createModule(_ *cobra.Command, args []string) {
 	projectModule, err := utility.GetModuleNameFromGoModFile()
+	if err != nil {
+		fmt.Println("Error finding Module name from go.mod:", err)
+		return
+	}
 	currentDir, err := os.Getwd()
 	if err != nil {
 		color.Redln("Error getting current directory:", err)
 		panic(err)
-		return
 	}
 	projectPath, err := utility.FindGitRoot(currentDir)
 	if err != nil {
@@ -112,22 +115,16 @@ func createProject(cmd *cobra.Command, args []string) {
 			switch q.Key {
 			case constant.ProjectNameKEY:
 				projectName = q.Answer
-				break
 			case constant.ProjectDescriptionKEY:
 				projectDescription = q.Answer
-				break
 			case constant.AuthorKEY:
 				author = q.Answer
-				break
 			case constant.ProjectModuleNameKEY:
 				projectModuleName = q.Answer
-				break
 			case constant.GoVersionKEY:
 				goVersion = q.Answer
-				break
 			case constant.DirectoryKEY:
 				directory = q.Answer
-				break
 			}
 		}
 	} else {
@@ -165,6 +162,5 @@ func createProject(cmd *cobra.Command, args []string) {
 	}
 
 	utility.PrintColorizeProjectDetail(data)
-	fmt.Println("\n")
-	return
+	fmt.Println("")
 }
