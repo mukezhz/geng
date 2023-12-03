@@ -67,7 +67,9 @@ geng gen module <module-name>
 - [ ] generate test case template
 
 ### Diagrams
-![image](https://github.com/mukezhz/geng/assets/43813670/98f13c33-320f-4a4d-aa80-92e76e66c2a3)
+
+<img width="457" alt="image" src="https://github.com/mukezhz/geng/assets/43813670/a0b11d39-e077-4038-852f-7b5b0adb27c8">
+
 
 
 
