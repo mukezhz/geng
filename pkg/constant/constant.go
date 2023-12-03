@@ -7,6 +7,7 @@ const (
 	ProjectDescriptionKEY = "projectDescription"
 	GoVersionKEY          = "goVersion"
 	DirectoryKEY          = "directory"
+	ModueleNameKEY        = "moduleName"
 )
 
 const (

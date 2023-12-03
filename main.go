@@ -23,7 +23,7 @@ var rootCmd = &cobra.Command{
 var newModuleCmd = &cobra.Command{
 	Use:   "gen features [name]",
 	Short: "Create a new features",
-	Args:  cobra.ExactArgs(2),
+	Args:  cobra.MaximumNArgs(2),
 	Run:   createModule,
 }
 
@@ -67,8 +67,22 @@ func createModule(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+	var moduleName string
+	if len(args) == 1 {
+		questions := []terminal.ProjectQuestion{
+			terminal.NewShortQuestion(constant.ModueleNameKEY, constant.ModueleNameKEY+" *", "Enter Module Name:"),
+		}
+		terminal.StartInteractiveTerminal(questions)
 
-	moduleName := args[1]
+		for _, q := range questions {
+			switch q.Key {
+			case constant.ModueleNameKEY:
+				moduleName = q.Answer
+			}
+		}
+	} else {
+		moduleName = args[1]
+	}
 	if !utility.CheckGolangIdentifier(moduleName) {
 		color.Redln("Error: module name is invalid")
 		return

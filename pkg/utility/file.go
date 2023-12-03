@@ -179,7 +179,6 @@ func CheckVersion(goVersion string) string {
 func GetModuleNameFromGoModFile() (model.GoMod, error) {
 	file, err := os.Open("go.mod")
 	goMod := model.GoMod{}
-
 	if err != nil {
 		return goMod, err
 	}
@@ -212,6 +211,5 @@ func GetModuleNameFromGoModFile() (model.GoMod, error) {
 		return goMod, err
 	}
 
-	abs, _ := filepath.Abs("go.mod")
-	return goMod, fmt.Errorf("module directive not found in %s", abs)
+	return goMod, nil
 }
