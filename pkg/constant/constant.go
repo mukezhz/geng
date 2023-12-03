@@ -17,4 +17,5 @@ const (
 	ProjectDescription = "Project Description"
 	GoVersion          = "Go Version"
 	Directory          = "Project Directory"
+	ModuleName         = "Module Name"
 )

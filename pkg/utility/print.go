@@ -45,7 +45,7 @@ func PrintColorizeModuleDetail(data model.ModuleData) {
 	
 	`)
 	color.Greenln("\tThe information you have provided:\n")
-	color.Cyanf("\t%-20s💻: %-15s\n", constant.ProjectName, data.ProjectName)
+	color.Cyanf("\t%-20s💻: %-15s\n", constant.ModuleName, data.PackageName)
 	color.Cyanf("\t%-20s📂: %-15s\n", constant.ProjectModuleName, data.ProjectModuleName)
 	color.Cyanf("\t%-20s🆚: %-15s\n", constant.GoVersion, data.GoVersion)
 	PrintFinalStepAfterModuleInitialization(data)

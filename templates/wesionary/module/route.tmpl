@@ -19,5 +19,5 @@ func New{{.ModuleName}}Route(router *infrastructure.Router, controller *{{.Modul
 }
 
 func (r *{{.ModuleName}}Route) RegisterHelloRoutes() {
-	r.groupRouter.GET("/", r.controller.HandleRoot)
+	r.groupRouter.GET("", r.controller.HandleRoot)
 }
