@@ -4,10 +4,6 @@ import (
 	"bufio"
 	"embed"
 	"fmt"
-	"github.com/gookit/color"
-	"github.com/mukezhz/geng/pkg/model"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"io"
 	"io/fs"
 	"os"
@@ -15,6 +11,11 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/gookit/color"
+	"github.com/mukezhz/geng/pkg/model"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func WriteContentToPath(path, content string) {
@@ -85,25 +86,20 @@ func GenerateFiles(templatesFS embed.FS, templatePath string, targetRoot string,
 		}
 
 		// Handle template files
-		if filepath.Ext(path) == ".tmpl" {
-			// Generate the Go file in the target directory
-			goFile := strings.Replace(dst, "tmpl", "go", 1)
-			generateFromEmbeddedTemplate(templatesFS, path, goFile, data)
-		} else {
-			// Copy or process other files as before
-			if filepath.Ext(path) == ".mod" || filepath.Ext(path) == ".md" {
-				dst = strings.Replace(dst, ".mod", "", 1)
-				generateFromEmbeddedTemplate(templatesFS, path, dst, data)
-			} else {
-				if strings.HasPrefix(fileName, "hidden.") {
-					dst = strings.Replace(dst, "hidden.", ".", 1)
-				}
-				// just copy the files to the target directory
-				if err := copyFile(path, dst, templatesFS); err != nil {
-					panic(err)
-				}
+		// Copy or process other files as before
+		if filepath.Ext(path) == ".mod" {
+			dst = strings.Replace(dst, ".mod", "", 1)
+		}
+		generateFromEmbeddedTemplate(templatesFS, path, dst, data)
+
+		if strings.HasPrefix(fileName, "hidden.") {
+			dst = strings.Replace(dst, "hidden.", ".", 1)
+			// just copy the files to the target directory
+			if err := copyFile(path, dst, templatesFS); err != nil {
+				panic(err)
 			}
 		}
+
 		return nil
 	})
 }
