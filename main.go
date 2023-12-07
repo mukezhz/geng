@@ -34,11 +34,18 @@ var newProjectCmd = &cobra.Command{
 	Run:   createProject,
 }
 
+var runProjectCmd = &cobra.Command{
+	Use:   "run [project name]",
+	Short: "Run the project",
+	Args:  cobra.MaximumNArgs(1),
+	Run:   runProject,
+}
+
 func init() {
 	newProjectCmd.Flags().StringP("mod", "m", "", "features name")
 	newProjectCmd.Flags().StringP("dir", "d", "", "target directory")
 	newProjectCmd.Flags().StringP("version", "v", "", "version support")
-	rootCmd.AddCommand(newModuleCmd, newProjectCmd)
+	rootCmd.AddCommand(newModuleCmd, newProjectCmd, runProjectCmd)
 }
 
 func main() {
@@ -177,4 +184,13 @@ func createProject(cmd *cobra.Command, args []string) {
 
 	utility.PrintColorizeProjectDetail(data)
 	fmt.Println("")
+}
+
+func runProject(cmd *cobra.Command, args []string) {
+	runGo := "go"
+	// execute command from golang
+	err := utility.ExecuteCommand(runGo, args...)
+	if err != nil {
+		return
+	}
 }
