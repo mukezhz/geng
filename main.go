@@ -16,8 +16,10 @@ import (
 var templatesFS embed.FS
 
 var rootCmd = &cobra.Command{
-	Use:   "geng",
-	Short: "Go Generate[geng] is a tool for generating Go modules",
+	Use:              "geng",
+	Short:            "Go Generate[geng] is a tool for generating Go modules",
+	Long:             "Go Generate[geng] is a tool for generating Go modules. ",
+	TraverseChildren: true,
 }
 
 var newModuleCmd = &cobra.Command{

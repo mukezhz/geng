@@ -90,6 +90,9 @@ func GenerateFiles(templatesFS embed.FS, templatePath string, targetRoot string,
 		if filepath.Ext(path) == ".mod" {
 			dst = strings.Replace(dst, ".mod", "", 1)
 		}
+		if filepath.Ext(path) == ".tmpl" {
+			dst = strings.Replace(dst, ".tmpl", ".go", 1)
+		}
 		generateFromEmbeddedTemplate(templatesFS, path, dst, data)
 
 		if strings.HasPrefix(fileName, "hidden.") {
