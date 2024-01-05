@@ -13,7 +13,7 @@ var runProjectCmd = &cobra.Command{
 	Run:   runProject,
 }
 
-func runProject(cmd *cobra.Command, args []string) {
+func runProject(_ *cobra.Command, args []string) {
 	runGo := "go"
 	// execute command from golang
 	err := utility.ExecuteCommand(runGo, args...)

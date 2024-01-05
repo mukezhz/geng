@@ -36,9 +36,6 @@ func createModule(_ *cobra.Command, args []string) {
 		return
 	}
 	mainModulePath := filepath.Join(projectPath, "domain", "features", "module.go")
-	if err != nil {
-		panic(err)
-	}
 	var moduleName string
 	if len(args) == 1 {
 		questions := []terminal.ProjectQuestion{
@@ -75,5 +72,4 @@ func createModule(_ *cobra.Command, args []string) {
 	utility.WriteContentToPath(mainModulePath, updatedCode)
 
 	utility.PrintColorizeModuleDetail(data)
-
 }
