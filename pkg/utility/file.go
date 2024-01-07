@@ -93,15 +93,12 @@ func GenerateFiles(templatesFS embed.FS, templatePath string, targetRoot string,
 		if filepath.Ext(path) == ".tmpl" {
 			dst = strings.Replace(dst, ".tmpl", ".go", 1)
 		}
-		generateFromEmbeddedTemplate(templatesFS, path, dst, data)
 
 		if strings.HasPrefix(fileName, "hidden.") {
 			dst = strings.Replace(dst, "hidden.", ".", 1)
 			// just copy the files to the target directory
-			if err := copyFile(path, dst, templatesFS); err != nil {
-				panic(err)
-			}
 		}
+		generateFromEmbeddedTemplate(templatesFS, path, dst, data)
 
 		return nil
 	})
