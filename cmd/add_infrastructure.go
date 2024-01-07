@@ -52,14 +52,23 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 	}
 
 	terminal.StartInteractiveTerminal(questions)
-
-	addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, false)
+	if len(infrasTmpl) == 0 {
+		color.Red.Println("No infrastructure selected")
+	}
+	items := addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, false)
+	if len(items) == 0 {
+		color.Red.Println("No infrastructure selected")
+		return
+	}
 	utility.PrintColorizeInfrastructureDetail(data, infras)
 }
 
 func addInfrastructure(questions []terminal.ProjectQuestion, infrasTmpl []string, infrastructureModulePath string, data model.ModuleData, isNewProject bool) []int {
 	var functions []string
 	var items []int
+	if len(items) == 0 {
+		return items
+	}
 	for _, q := range questions {
 		switch q.Key {
 		case constant.InfrastructureNameKEY:
