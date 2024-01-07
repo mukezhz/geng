@@ -53,3 +53,7 @@ func (a *longAnswerField) Blur() tea.Msg {
 func (a *longAnswerField) Value() string {
 	return a.textarea.Value()
 }
+
+func (a *longAnswerField) Selected() map[int]any {
+	return nil
+}

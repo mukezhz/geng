@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
@@ -25,15 +26,23 @@ func createProject(cmd *cobra.Command, args []string) {
 	var projectDescription string
 	var author string
 	var directory string
+	var questions []terminal.ProjectQuestion
+
+	templateInfraPath := filepath.Join(".", "templates", "wesionary", "infrastructure")
+	infrasTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
+	infras := utility.Map[string, string](infrasTmpl, func(q string) string {
+		return strings.Replace(q, ".tmpl", "", 1)
+	})
 
 	if len(args) == 0 {
-		questions := []terminal.ProjectQuestion{
+		questions = []terminal.ProjectQuestion{
 			terminal.NewShortQuestion(constant.ProjectNameKEY, constant.ProjectName+" *", "Enter Project Name:"),
 			terminal.NewShortQuestion(constant.ProjectModuleNameKEY, constant.ProjectModuleName+" *", "Enter Module Name:"),
 			terminal.NewShortQuestion(constant.AuthorKEY, constant.Author+" [Optional]", "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
 			terminal.NewLongQuestion(constant.ProjectDescriptionKEY, constant.ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
 			terminal.NewShortQuestion(constant.GoVersionKEY, constant.GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
 			terminal.NewShortQuestion(constant.DirectoryKEY, constant.Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
+			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", infras),
 		}
 		terminal.StartInteractiveTerminal(questions)
 
@@ -85,6 +94,13 @@ func createProject(cmd *cobra.Command, args []string) {
 	if err != nil {
 		color.Redln("Error generate file", err)
 		return
+	}
+	for _, q := range questions {
+		switch q.Key {
+		case constant.InfrastructureNameKEY:
+			infrastructureModulePath := filepath.Join(projectName, "pkg", "infrastructure", "module.go")
+			addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, true)
+		}
 	}
 
 	utility.PrintColorizeProjectDetail(data)

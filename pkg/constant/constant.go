@@ -8,6 +8,7 @@ const (
 	GoVersionKEY          = "goVersion"
 	DirectoryKEY          = "directory"
 	ModueleNameKEY        = "moduleName"
+	InfrastructureNameKEY = "infrastructureName"
 )
 
 const (
@@ -18,4 +19,5 @@ const (
 	GoVersion          = "Go Version"
 	Directory          = "Project Directory"
 	ModuleName         = "Module Name"
+	InfrastructureName = "Infrastructures"
 )

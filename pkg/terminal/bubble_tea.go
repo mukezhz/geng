@@ -2,9 +2,9 @@ package terminal
 
 import (
 	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"log"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m *Model) Init() tea.Cmd {
@@ -22,8 +22,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", tea.KeyEsc.String(), tea.KeyEscape.String():
 			return m, tea.Quit
-		case tea.KeyEsc.String():
-			return m, tea.Quit
+
 		case "enter":
 			if m.index == len(m.questions)-1 {
 				m.done = true
@@ -41,7 +40,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Model) View() string {
-	current := m.questions[m.index]
 	if m.done {
 		var output string
 		for _, q := range m.questions {
@@ -52,18 +50,7 @@ func (m *Model) View() string {
 	if m.width == 0 {
 		return "loading..."
 	}
-	// stack some left-aligned strings together in the center of the window
-	return lipgloss.Place(
-		m.width,
-		m.height,
-		lipgloss.Center,
-		lipgloss.Center,
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			current.Question,
-			m.styles.InputField.Render(current.Input.View()),
-		),
-	)
+	return DefaultView(m)
 }
 
 func (m *Model) Next() {

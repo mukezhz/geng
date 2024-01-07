@@ -35,6 +35,13 @@ func NewLongQuestion(k, q, p string) ProjectQuestion {
 	return question
 }
 
+func NewCheckboxQuestion(k, t string, items []string) ProjectQuestion {
+	question := NewQuestion(k, t, "")
+	model := NewCheckBoxField(t, items)
+	question.Input = model
+	return question
+}
+
 func New(questions []ProjectQuestion) *Model {
 	styles := DefaultStyles()
 	return &Model{styles: styles, questions: questions}

@@ -98,13 +98,13 @@ func GenerateFiles(templatesFS embed.FS, templatePath string, targetRoot string,
 			dst = strings.Replace(dst, "hidden.", ".", 1)
 			// just copy the files to the target directory
 		}
-		generateFromEmbeddedTemplate(templatesFS, path, dst, data)
+		GenerateFromEmbeddedTemplate(templatesFS, path, dst, data)
 
 		return nil
 	})
 }
 
-func generateFromEmbeddedTemplate(templatesFS embed.FS, path, targetFilePath string, data interface{}) {
+func GenerateFromEmbeddedTemplate(templatesFS embed.FS, path, targetFilePath string, data interface{}) {
 	tmpl, err := template.ParseFS(templatesFS, path)
 	if err != nil {
 		panic(err)
@@ -127,7 +127,7 @@ func generateFromEmbeddedTemplate(templatesFS embed.FS, path, targetFilePath str
 	}
 }
 
-func copyFile(src, dst string, templatesFS embed.FS) error {
+func CopyFile(src, dst string, templatesFS embed.FS) error {
 	sourceFile, err := templatesFS.Open(src)
 	if err != nil {
 		return err
