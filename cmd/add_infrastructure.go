@@ -15,14 +15,14 @@ import (
 )
 
 var addInfrastructureCmd = &cobra.Command{
-	Use:   "add infra [name]",
+	Use:   "infra add [name]",
 	Short: "Add a new infrastructure",
 	Args:  cobra.MaximumNArgs(2),
 	Run:   addInfrastructureHandler,
 }
 
 func addInfrastructureHandler(_ *cobra.Command, args []string) {
-	if len(args) > 0 && !strings.Contains(args[0], "infra") {
+	if len(args) > 0 && !strings.Contains(args[0], "add") {
 		color.Redln("Error: invalid command")
 		return
 	}
@@ -89,6 +89,7 @@ func addInfrastructure(
 	updatedCode := utility.AddListOfProvideInFxOptions(infrastructureModulePath, functions)
 	utility.WriteContentToPath(infrastructureModulePath, updatedCode)
 
+	var servicesTmpl []string
 	for _, i := range items {
 		templatePath := filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[i])
 		var targetRoot string
@@ -97,7 +98,25 @@ func addInfrastructure(
 		} else {
 			targetRoot = filepath.Join(".", "pkg", "infrastructure", strings.Replace(infrasTmpl[i], ".tmpl", ".go", 1))
 		}
+
+		fileName := strings.Replace(infrasTmpl[i], ".tmpl", "", 1)
+		serviceTemplatePath := filepath.Join(".", "templates", "wesionary", "service")
+		for _, file := range utility.ListDirectory(templatesFS, serviceTemplatePath) {
+			if strings.Contains(file, fileName) {
+				servicesTmpl = append(servicesTmpl, file)
+			}
+		}
 		utility.GenerateFromEmbeddedTemplate(templatesFS, templatePath, targetRoot, data)
+
+		// add service too
+		var serviceModulePath string
+		if isNewProject {
+			serviceModulePath = filepath.Join(data.PackageName, "pkg", "services", "module.go")
+		} else {
+			serviceModulePath = filepath.Join(".", "pkg", "services", "module.go")
+		}
+
+		addService(questions, servicesTmpl, serviceModulePath, data, true, templatesFS)
 	}
 	return items
 }

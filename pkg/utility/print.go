@@ -104,6 +104,44 @@ func PrintFinalStepAfterInfrastructureAddition(data model.ModuleData) {
 	color.Yellowf(output)
 }
 
+func PrintColorizeServiceDetail(data model.ModuleData, infras []string) {
+	color.Cyanln(`
+	    GENG: GENERATE GOLANG INFRASTRUCTURE
+	
+	 ██████╗ ███████╗███╗   ██╗       ██████╗ 
+	██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
+	██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
+	██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
+	╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
+	 ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
+											  
+	
+	`)
+	color.Greenln("\tThe information you have provided:\n")
+	color.Cyanf("\t%-20s💻: %-15s\n", constant.ModuleName, data.PackageName)
+	color.Cyanf("\t%-20s📂: %-15s\n", constant.ProjectModuleName, data.ProjectModuleName)
+	color.Cyanf("\t%-20s🆚: %-15s\n", constant.GoVersion, data.GoVersion)
+	color.Cyanf("\t%-20s🆚: %-15s\n", "Selected", constant.InfrastructureName)
+	for _, infra := range infras {
+		color.Cyanf("\t%-20s: [x]%-15s\n", "", infra)
+	}
+	PrintFinalStepAfterServiceAddition(data)
+	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
+}
+
+func PrintFinalStepAfterServiceAddition(data model.ModuleData) {
+	output := fmt.Sprintf(`
+	🎉 Successfully added service %v
+
+	↪️ Restart the server to see the changes:
+
+	🌐 Check the following path:
+	    %v
+
+`, data.ModuleName, "pkg/services/")
+	color.Yellowf(output)
+}
+
 func PrintFinalStepAfterProjectInitialization(data model.ModuleData) {
 	output := fmt.Sprintf(`
 	💻 Change directory to project:

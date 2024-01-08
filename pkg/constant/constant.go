@@ -9,6 +9,7 @@ const (
 	DirectoryKEY          = "directory"
 	ModueleNameKEY        = "moduleName"
 	InfrastructureNameKEY = "infrastructureName"
+	ServiceNameKEY        = "serviceName"
 )
 
 const (
@@ -20,4 +21,5 @@ const (
 	Directory          = "Project Directory"
 	ModuleName         = "Module Name"
 	InfrastructureName = "Infrastructures"
+	ServiceName        = "Services"
 )
