@@ -90,7 +90,7 @@ func (s *S3BucketService) GetSignedURL(
 	folder string,
 	expires *time.Time,
 ) string {
-	key := fmt.Sprintf("%v::%v", folder, fileData.Key)
+	key := fmt.Sprintf("%v::%v", folder, fileData.Key())
 
 	if url, err := s.cache.Get(key); err == nil {
 		return url.(string)
@@ -101,7 +101,7 @@ func (s *S3BucketService) GetSignedURL(
 		expires = &e
 	}
 
-	dst := fmt.Sprintf("%v/%v", folder, fileData.Key)
+	dst := fmt.Sprintf("%v/%v", folder, fileData.Key())
 
 	fileName := ""
 	if fileData.FileName() == "" {
@@ -110,7 +110,7 @@ func (s *S3BucketService) GetSignedURL(
 		fileName = fileData.FileName()
 	}
 
-	extension := strings.ToLower(filepath.Ext(fileData.Key))
+	extension := strings.ToLower(filepath.Ext(fileData.Key()))
 	mimeType := mime.TypeByExtension(extension)
 
 	input := &s3.GetObjectInput{

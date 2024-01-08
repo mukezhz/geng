@@ -186,7 +186,7 @@ func AddListOfProvideInFxOptions(path string, providerList []string) string {
 	formattedCode := buf.String()
 	for _, provider := range providerList {
 		providerToInsert := fmt.Sprintf("fx.Provide(%v)", provider)
-		formattedCode = strings.Replace(formattedCode, providerToInsert, "\n\t\t"+providerToInsert, -1)
+		formattedCode = strings.Replace(formattedCode, providerToInsert, "\n\t\t"+providerToInsert, 1)
 	}
 	return formattedCode
 }
