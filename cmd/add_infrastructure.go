@@ -59,7 +59,12 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		color.Red.Println("No infrastructure selected")
 		return
 	}
-	utility.PrintColorizeInfrastructureDetail(data, infras)
+	var selectedInfras []string
+	for _, i := range items {
+		selectedInfras = append(selectedInfras, infras[i])
+	}
+	_ = selectedInfras // Fix for SA4010: this result of append is never used, except maybe in other appends
+	utility.PrintColorizeInfrastructureDetail(data, selectedInfras)
 }
 
 func addInfrastructure(

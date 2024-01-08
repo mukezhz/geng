@@ -83,9 +83,9 @@ func PrintColorizeInfrastructureDetail(data model.ModuleData, infras []string) {
 	color.Cyanf("\t%-20s💻: %-15s\n", constant.ModuleName, data.PackageName)
 	color.Cyanf("\t%-20s📂: %-15s\n", constant.ProjectModuleName, data.ProjectModuleName)
 	color.Cyanf("\t%-20s🆚: %-15s\n", constant.GoVersion, data.GoVersion)
-	color.Cyanf("\t%-20s🆚: %-15s\n", "Selected", constant.InfrastructureName)
+	color.Cyanf("\t%-20s🆚: %-15s\n\n", "Selected", constant.InfrastructureName)
 	for _, infra := range infras {
-		color.Cyanf("\t%-20s: [x]%-15s\n", "", infra)
+		color.Cyanf("\t%-20s[x]%-15s\n", "", infra)
 	}
 	PrintFinalStepAfterInfrastructureAddition(data)
 	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
@@ -104,7 +104,7 @@ func PrintFinalStepAfterInfrastructureAddition(data model.ModuleData) {
 	color.Yellowf(output)
 }
 
-func PrintColorizeServiceDetail(data model.ModuleData, infras []string) {
+func PrintColorizeServiceDetail(data model.ModuleData, services []string) {
 	color.Cyanln(`
 	    GENG: GENERATE GOLANG INFRASTRUCTURE
 	
@@ -121,9 +121,9 @@ func PrintColorizeServiceDetail(data model.ModuleData, infras []string) {
 	color.Cyanf("\t%-20s💻: %-15s\n", constant.ModuleName, data.PackageName)
 	color.Cyanf("\t%-20s📂: %-15s\n", constant.ProjectModuleName, data.ProjectModuleName)
 	color.Cyanf("\t%-20s🆚: %-15s\n", constant.GoVersion, data.GoVersion)
-	color.Cyanf("\t%-20s🆚: %-15s\n", "Selected", constant.InfrastructureName)
-	for _, infra := range infras {
-		color.Cyanf("\t%-20s: [x]%-15s\n", "", infra)
+	color.Cyanf("\t%-20s🆚: %-15s\n\n", "Selected", constant.InfrastructureName)
+	for _, service := range services {
+		color.Cyanf("\t%-20s[x]%-15s\n", "", service)
 	}
 	PrintFinalStepAfterServiceAddition(data)
 	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")

@@ -60,8 +60,11 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 		color.Red.Println("No Service selected")
 		return
 	}
-
-	utility.PrintColorizeServiceDetail(data, services)
+	var selectedServices []string
+	for _, i := range items {
+		selectedServices = append(selectedServices, services[i])
+	}
+	utility.PrintColorizeServiceDetail(data, selectedServices)
 }
 
 func addService(
