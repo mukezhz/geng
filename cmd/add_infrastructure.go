@@ -66,9 +66,6 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 func addInfrastructure(questions []terminal.ProjectQuestion, infrasTmpl []string, infrastructureModulePath string, data model.ModuleData, isNewProject bool) []int {
 	var functions []string
 	var items []int
-	if len(items) == 0 {
-		return items
-	}
 	for _, q := range questions {
 		switch q.Key {
 		case constant.InfrastructureNameKEY:
