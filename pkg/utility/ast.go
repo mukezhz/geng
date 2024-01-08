@@ -154,13 +154,30 @@ func AddListOfProvideInFxOptions(path string, providerList []string) string {
 		fmt.Println(err)
 	}
 
+	// Track existing providers
+	existingProviders := make(map[string]any)
 	// Traverse the AST and find the fx.Options call
 	ast.Inspect(node, func(n ast.Node) bool {
 		switch x := n.(type) {
 		case *ast.CallExpr:
-			if sel, ok := x.Fun.(*ast.SelectorExpr); ok {
-				if sel.Sel.Name == "Options" {
-					for _, provider := range providerList {
+			if sel, ok := x.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "Options" {
+
+				// Check existing arguments in fx.Options
+				for _, arg := range x.Args {
+					if callExpr, ok := arg.(*ast.CallExpr); ok {
+						if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok && selExpr.Sel.Name == "Provide" {
+							if len(callExpr.Args) > 0 {
+								if ident, ok := callExpr.Args[0].(*ast.Ident); ok {
+									existingProviders[ident.Name] = struct{}{}
+								}
+							}
+						}
+					}
+				}
+
+				// Add new providers
+				for _, provider := range providerList {
+					if _, exists := existingProviders[provider]; !exists {
 						x.Args = append(x.Args, &ast.CallExpr{
 							Fun: &ast.SelectorExpr{
 								X:   ast.NewIdent("fx"),
@@ -185,8 +202,11 @@ func AddListOfProvideInFxOptions(path string, providerList []string) string {
 	}
 	formattedCode := buf.String()
 	for _, provider := range providerList {
+		if _, exists := existingProviders[provider]; exists {
+			continue
+		}
 		providerToInsert := fmt.Sprintf("fx.Provide(%v)", provider)
-		formattedCode = strings.Replace(formattedCode, providerToInsert, "\n\t\t"+providerToInsert, 1)
+		formattedCode = strings.Replace(formattedCode, providerToInsert, "\n\t\t"+providerToInsert, -1)
 	}
 	return formattedCode
 }

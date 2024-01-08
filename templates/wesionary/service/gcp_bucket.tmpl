@@ -26,8 +26,8 @@ func NewGcpBucketService(
 	logger framework.Logger,
 	client *storage.Client,
 	env *framework.Env,
-) BucketService {
-	return BucketService{
+) GcpBucketService {
+	return GcpBucketService{
 		logger: logger,
 		client: client,
 		env:    env,
@@ -35,7 +35,7 @@ func NewGcpBucketService(
 }
 
 // UploadFile -> uploads the file to the cloud storage
-func (s *BucketService) UploadFile(
+func (s *GcpBucketService) UploadFile(
 	ctx context.Context,
 	file io.Reader,
 	fileName string,
@@ -85,7 +85,7 @@ func (s *BucketService) UploadFile(
 }
 
 // GetObjectSignedURL -> gets the signed url for the stored object
-func (s *BucketService) GetObjectSignedURL(
+func (s *GcpBucketService) GetObjectSignedURL(
 	object string,
 ) (string, error) {
 	var bucketName = s.env.StorageBucketName
@@ -119,7 +119,7 @@ func (s *BucketService) GetObjectSignedURL(
 }
 
 // RemoveObject -> removes the file from the storage bucket
-func (s *BucketService) RemoveObject(
+func (s *GcpBucketService) RemoveObject(
 	objectName string,
 	bucketName string,
 	thumb bool,

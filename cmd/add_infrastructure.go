@@ -89,7 +89,7 @@ func addInfrastructure(
 	updatedCode := utility.AddListOfProvideInFxOptions(infrastructureModulePath, functions)
 	utility.WriteContentToPath(infrastructureModulePath, updatedCode)
 
-	var servicesTmpl []string
+	servicesTmplMap := make(map[string]bool)
 	for _, i := range items {
 		templatePath := filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[i])
 		var targetRoot string
@@ -103,20 +103,24 @@ func addInfrastructure(
 		serviceTemplatePath := filepath.Join(".", "templates", "wesionary", "service")
 		for _, file := range utility.ListDirectory(templatesFS, serviceTemplatePath) {
 			if strings.Contains(file, fileName) {
-				servicesTmpl = append(servicesTmpl, file)
+				servicesTmplMap[file] = true
 			}
 		}
 		utility.GenerateFromEmbeddedTemplate(templatesFS, templatePath, targetRoot, data)
 
-		// add service too
-		var serviceModulePath string
-		if isNewProject {
-			serviceModulePath = filepath.Join(data.PackageName, "pkg", "services", "module.go")
-		} else {
-			serviceModulePath = filepath.Join(".", "pkg", "services", "module.go")
-		}
-
-		addService(questions, servicesTmpl, serviceModulePath, data, true, templatesFS)
 	}
+	// add service too
+	var serviceModulePath string
+	if isNewProject {
+		serviceModulePath = filepath.Join(data.PackageName, "pkg", "services", "module.go")
+	} else {
+		serviceModulePath = filepath.Join(".", "pkg", "services", "module.go")
+	}
+	var servicesTmpl []string
+	for k := range servicesTmplMap {
+		servicesTmpl = append(servicesTmpl, k)
+	}
+
+	addService(questions, servicesTmpl, serviceModulePath, data, true, templatesFS)
 	return items
 }
