@@ -98,7 +98,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	for _, q := range questions {
 		switch q.Key {
 		case constant.InfrastructureNameKEY:
-			infrastructureModulePath := filepath.Join(projectName, "pkg", "infrastructure", "module.go")
+			infrastructureModulePath := filepath.Join(data.PackageName, "pkg", "infrastructure", "module.go")
 			addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, true, templatesFS)
 		}
 	}
