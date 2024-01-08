@@ -2,6 +2,7 @@ package utility
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -9,6 +10,8 @@ import (
 	"go/token"
 	"path/filepath"
 	"strings"
+
+	"github.com/gookit/color"
 )
 
 func ImportPackage(node *ast.File, projectModule, packageName string) {
@@ -84,9 +87,13 @@ func AddAnotherFxOptionsInModule(path, module, projectModule string) string {
 	return formattedCode
 }
 
-func GetFunctionDeclarations(path string) []string {
+func GetFunctionDeclarations(path string, templatesFS embed.FS) []string {
 	fset := token.NewFileSet()
-	node, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
+	f, err := templatesFS.Open(path)
+	if err != nil {
+		color.Redln(err)
+	}
+	node, err := parser.ParseFile(fset, "", f, parser.ParseComments)
 	if err != nil {
 		fmt.Println(err)
 	}

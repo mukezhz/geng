@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"embed"
 	"os"
 	"path/filepath"
 	"strings"
@@ -48,14 +49,12 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		return strings.Replace(q, ".tmpl", "", 1)
 	})
 	questions := []terminal.ProjectQuestion{
-		terminal.NewCheckboxQuestion(constant.ModueleNameKEY, "Select the infrastructure? [<space> to select]", infras),
+		terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select]", infras),
 	}
 
 	terminal.StartInteractiveTerminal(questions)
-	if len(infrasTmpl) == 0 {
-		color.Red.Println("No infrastructure selected")
-	}
-	items := addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, false)
+
+	items := addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, false, templatesFS)
 	if len(items) == 0 {
 		color.Red.Println("No infrastructure selected")
 		return
@@ -63,7 +62,13 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 	utility.PrintColorizeInfrastructureDetail(data, infras)
 }
 
-func addInfrastructure(questions []terminal.ProjectQuestion, infrasTmpl []string, infrastructureModulePath string, data model.ModuleData, isNewProject bool) []int {
+func addInfrastructure(
+	questions []terminal.ProjectQuestion,
+	infrasTmpl []string,
+	infrastructureModulePath string,
+	data model.ModuleData,
+	isNewProject bool,
+	templatesFS embed.FS) []int {
 	var functions []string
 	var items []int
 	for _, q := range questions {
@@ -72,11 +77,14 @@ func addInfrastructure(questions []terminal.ProjectQuestion, infrasTmpl []string
 			selected := q.Input.Selected()
 			for s := range selected {
 				functions = append(functions,
-					utility.GetFunctionDeclarations(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s]))...,
+					utility.GetFunctionDeclarations(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s]), templatesFS)...,
 				)
 				items = append(items, s)
 			}
 		}
+	}
+	if len(items) == 0 {
+		return items
 	}
 	updatedCode := utility.AddListOfProvideInFxOptions(infrastructureModulePath, functions)
 	utility.WriteContentToPath(infrastructureModulePath, updatedCode)
