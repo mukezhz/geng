@@ -8,8 +8,8 @@ import (
 	"google.golang.org/api/option"
 )
 
-// NewBucketStorage creates a new storage client
-func NewBucketStorage(logger framework.Logger, env *framework.Env) *storage.Client {
+// NewGcpBucketStorage creates a new storage client
+func NewGcpBucketStorage(logger framework.Logger, env *framework.Env) *storage.Client {
 	bucketName := env.StorageBucketName
 	ctx := context.Background()
 	if bucketName == "" {
