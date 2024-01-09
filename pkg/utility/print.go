@@ -2,6 +2,7 @@ package utility
 
 import (
 	"fmt"
+
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
 	"github.com/mukezhz/geng/pkg/model"
@@ -62,6 +63,82 @@ func PrintFinalStepAfterModuleInitialization(data model.ModuleData) {
 	    %v
 
 `, data.ModuleName, "/api/"+data.PackageName)
+	color.Yellowf(output)
+}
+
+func PrintColorizeInfrastructureDetail(data model.ModuleData, infras []string) {
+	color.Cyanln(`
+	    GENG: GENERATE GOLANG INFRASTRUCTURE
+	
+	 ██████╗ ███████╗███╗   ██╗       ██████╗ 
+	██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
+	██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
+	██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
+	╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
+	 ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
+											  
+	
+	`)
+	color.Greenln("\tThe information you have provided:\n")
+	color.Cyanf("\t%-20s💻: %-15s\n", constant.ModuleName, data.PackageName)
+	color.Cyanf("\t%-20s📂: %-15s\n", constant.ProjectModuleName, data.ProjectModuleName)
+	color.Cyanf("\t%-20s🆚: %-15s\n", constant.GoVersion, data.GoVersion)
+	color.Cyanf("\t%-20s🆚: %-15s\n\n", "Selected", constant.InfrastructureName)
+	for _, infra := range infras {
+		color.Cyanf("\t%-20s[x]%-15s\n", "", infra)
+	}
+	PrintFinalStepAfterInfrastructureAddition(data)
+	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
+}
+
+func PrintFinalStepAfterInfrastructureAddition(data model.ModuleData) {
+	output := fmt.Sprintf(`
+	🎉 Successfully added infrastructure %v
+
+	↪️ Restart the server to see the changes:
+
+	🌐 Check the following path:
+	    %v
+
+`, data.ModuleName, "pkg/infrastructure/")
+	color.Yellowf(output)
+}
+
+func PrintColorizeServiceDetail(data model.ModuleData, services []string) {
+	color.Cyanln(`
+	    GENG: GENERATE GOLANG INFRASTRUCTURE
+	
+	 ██████╗ ███████╗███╗   ██╗       ██████╗ 
+	██╔════╝ ██╔════╝████╗  ██║      ██╔════╝ 
+	██║  ███╗█████╗  ██╔██╗ ██║█████╗██║  ███╗
+	██║   ██║██╔══╝  ██║╚██╗██║╚════╝██║   ██║
+	╚██████╔╝███████╗██║ ╚████║      ╚██████╔╝
+	 ╚═════╝ ╚══════╝╚═╝  ╚═══╝       ╚═════╝ 
+											  
+	
+	`)
+	color.Greenln("\tThe information you have provided:\n")
+	color.Cyanf("\t%-20s💻: %-15s\n", constant.ModuleName, data.PackageName)
+	color.Cyanf("\t%-20s📂: %-15s\n", constant.ProjectModuleName, data.ProjectModuleName)
+	color.Cyanf("\t%-20s🆚: %-15s\n", constant.GoVersion, data.GoVersion)
+	color.Cyanf("\t%-20s🆚: %-15s\n\n", "Selected", constant.InfrastructureName)
+	for _, service := range services {
+		color.Cyanf("\t%-20s[x]%-15s\n", "", service)
+	}
+	PrintFinalStepAfterServiceAddition(data)
+	color.Redln("\n\tThank You For using 🙏🇳🇵🙏:\n")
+}
+
+func PrintFinalStepAfterServiceAddition(data model.ModuleData) {
+	output := fmt.Sprintf(`
+	🎉 Successfully added service %v
+
+	↪️ Restart the server to see the changes:
+
+	🌐 Check the following path:
+	    %v
+
+`, data.ModuleName, "pkg/services/")
 	color.Yellowf(output)
 }
 

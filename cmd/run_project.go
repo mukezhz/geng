@@ -38,4 +38,6 @@ func init() {
 	rootCmd.AddCommand(newModuleCmd)
 	rootCmd.AddCommand(newProjectCmd)
 	rootCmd.AddCommand(runProjectCmd)
+	rootCmd.AddCommand(addInfrastructureCmd)
+	rootCmd.AddCommand(addServiceCmd)
 }
