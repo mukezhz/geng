@@ -99,7 +99,11 @@ func addInfrastructure(
 		templatePath := filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[i])
 		var targetRoot string
 		if isNewProject {
-			targetRoot = filepath.Join(data.PackageName, "pkg", "infrastructure", strings.Replace(infrasTmpl[i], ".tmpl", ".go", 1))
+			if data.Directory == "" {
+				targetRoot = filepath.Join(data.PackageName, "pkg", "infrastructure", strings.Replace(infrasTmpl[i], ".tmpl", ".go", 1))
+			} else {
+				targetRoot = filepath.Join(data.Directory, "pkg", "infrastructure", strings.Replace(infrasTmpl[i], ".tmpl", ".go", 1))
+			}
 		} else {
 			targetRoot = filepath.Join(".", "pkg", "infrastructure", strings.Replace(infrasTmpl[i], ".tmpl", ".go", 1))
 		}
