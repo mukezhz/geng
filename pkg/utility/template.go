@@ -1,10 +1,13 @@
 package utility
 
 import (
-	"github.com/gookit/color"
-	"github.com/mukezhz/geng/pkg/model"
+	"embed"
+	"log"
 	"os"
 	"text/template"
+
+	"github.com/gookit/color"
+	"github.com/mukezhz/geng/pkg/model"
 )
 
 func GenerateFromTemplate(templateFile, outputFile string, data model.ModuleData) {
@@ -27,4 +30,17 @@ func GenerateFromTemplate(templateFile, outputFile string, data model.ModuleData
 	if err != nil {
 		panic(err)
 	}
+}
+
+func ListDirectory(templatesFS embed.FS, dirPath string) []string {
+	f := []string{}
+	files, err := templatesFS.ReadDir(dirPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		f = append(f, file.Name())
+	}
+	return f
 }

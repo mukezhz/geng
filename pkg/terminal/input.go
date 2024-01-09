@@ -12,6 +12,7 @@ type Input interface {
 	Value() string
 	Update(tea.Msg) (Input, tea.Cmd)
 	View() string
+	Selected() map[int]any
 }
 
 // We need to have a wrapper for our bubbles as they don't currently implement the tea.Model interface

@@ -55,3 +55,7 @@ func (a *shortAnswerField) Blur() tea.Msg {
 func (a *shortAnswerField) Value() string {
 	return a.textinput.Value()
 }
+
+func (a *shortAnswerField) Selected() map[int]any {
+	return nil
+}
