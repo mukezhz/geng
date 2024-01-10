@@ -63,7 +63,7 @@ geng gen module <module-name>
 - [x] refactor the code -> make code clean
 - [x] modify the parent features `module.go` when new module is added
 - [x] implement CI for assets build
-- [ ] add option to generate constructor of aws, gcp while project generation
+- [x] add option to generate constructor of aws, gcp while project generation
 - [ ] allow different template options when building project
 - [ ] generate test case template
 - [ ] generate hexagonal architecture
