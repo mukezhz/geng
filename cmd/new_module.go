@@ -13,8 +13,8 @@ import (
 )
 
 var newModuleCmd = &cobra.Command{
-	Use:   "gen features [name]",
-	Short: "Create a new features",
+	Use:   "gen module [name]",
+	Short: "Create a new domain",
 	Args:  cobra.MaximumNArgs(2),
 	Run:   createModule,
 }
@@ -35,7 +35,7 @@ func createModule(_ *cobra.Command, args []string) {
 		fmt.Println("Error finding Git root:", err)
 		return
 	}
-	mainModulePath := filepath.Join(projectPath, "domain", "features", "module.go")
+	mainModulePath := filepath.Join(projectPath, "domain", "module.go")
 	var moduleName string
 	if len(args) == 1 {
 		questions := []terminal.ProjectQuestion{
@@ -59,7 +59,7 @@ func createModule(_ *cobra.Command, args []string) {
 	data := utility.GetModuleDataFromModuleName(moduleName, projectModule.Module, projectModule.GoVersion)
 
 	// Define the directory structure
-	targetRoot := filepath.Join(".", "domain", "features", data.PackageName)
+	targetRoot := filepath.Join(".", "domain", data.PackageName)
 	templatePath := filepath.Join(".", "templates", "wesionary", "module")
 
 	err = utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)

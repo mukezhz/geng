@@ -15,7 +15,7 @@ import (
 )
 
 func ImportPackage(node *ast.File, projectModule, packageName string) {
-	path := filepath.Join(projectModule, "domain", "features", packageName)
+	path := filepath.Join(projectModule, "domain", packageName)
 	importSpec := &ast.ImportSpec{
 		Path: &ast.BasicLit{
 			Kind:  token.STRING,
@@ -59,17 +59,10 @@ func AddAnotherFxOptionsInModule(path, module, projectModule string) string {
 		switch x := n.(type) {
 		case *ast.CallExpr:
 			if sel, ok := x.Fun.(*ast.SelectorExpr); ok {
-				if sel.Sel.Name == "Module" {
-					x.Args = append(x.Args, &ast.CallExpr{
-						Fun: &ast.SelectorExpr{
-							X:   ast.NewIdent("fx"),
-							Sel: ast.NewIdent("Options"),
-						},
-						Args: []ast.Expr{
-							ast.NewIdent(module + ".Module"),
-						},
-						Rparen: token.Pos(1),
-					})
+				if sel.Sel.Name == "Options" {
+					x.Args = append(x.Args, []ast.Expr{
+						ast.NewIdent(module + ".Module"),
+					}...)
 				}
 			}
 		}
@@ -82,7 +75,7 @@ func AddAnotherFxOptionsInModule(path, module, projectModule string) string {
 		fmt.Println(err)
 	}
 	formattedCode := buf.String()
-	providerToInsert := fmt.Sprintf("fx.Options(%v.Module),", module)
+	providerToInsert := fmt.Sprintf("%v.Module,", module)
 	formattedCode = strings.Replace(formattedCode, providerToInsert, "\n\t"+providerToInsert, 1)
 	return formattedCode
 }
