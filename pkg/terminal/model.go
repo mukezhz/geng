@@ -2,19 +2,19 @@ package terminal
 
 type Model struct {
 	styles    *Styles
-	index     int
 	questions []ProjectQuestion
+	index     int
 	width     int
 	height    int
 	done      bool
 }
 
 type ProjectQuestion struct {
+	Input       Input
 	Key         string
 	PlaceHolder string
 	Question    string
 	Answer      string
-	Input       Input
 }
 
 func NewQuestion(k, q, p string) ProjectQuestion {

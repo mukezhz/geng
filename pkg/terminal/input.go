@@ -13,6 +13,8 @@ type Input interface {
 	Update(tea.Msg) (Input, tea.Cmd)
 	View() string
 	Selected() map[int]any
+	SetExited()
+	Exited() bool
 }
 
 // We need to have a wrapper for our bubbles as they don't currently implement the tea.Model interface

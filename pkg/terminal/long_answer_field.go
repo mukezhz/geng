@@ -7,6 +7,7 @@ import (
 
 type longAnswerField struct {
 	textarea textarea.Model
+	exited   bool
 }
 
 func NewLongAnswerField() *longAnswerField {
@@ -56,4 +57,12 @@ func (a *longAnswerField) Value() string {
 
 func (a *longAnswerField) Selected() map[int]any {
 	return nil
+}
+
+func (a *longAnswerField) SetExited() {
+	a.exited = true
+}
+
+func (a *longAnswerField) Exited() bool {
+	return a.exited
 }

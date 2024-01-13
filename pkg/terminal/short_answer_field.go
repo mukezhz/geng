@@ -7,6 +7,7 @@ import (
 
 type shortAnswerField struct {
 	textinput textinput.Model
+	exited    bool
 }
 
 func NewShortAnswerField(p string) *shortAnswerField {
@@ -17,7 +18,6 @@ func NewShortAnswerField(p string) *shortAnswerField {
 	model := textinput.New()
 	model.Placeholder = p
 	model.Focus()
-
 	a.textinput = model
 	return &a
 }
@@ -58,4 +58,12 @@ func (a *shortAnswerField) Value() string {
 
 func (a *shortAnswerField) Selected() map[int]any {
 	return nil
+}
+
+func (a *shortAnswerField) SetExited() {
+	a.exited = true
+}
+
+func (a *shortAnswerField) Exited() bool {
+	return a.exited
 }

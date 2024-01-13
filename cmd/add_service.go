@@ -54,6 +54,12 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 	}
 
 	terminal.StartInteractiveTerminal(questions)
+	for _, q := range questions {
+		if q.Input.Exited() {
+			color.Redln("exited without completing...")
+			return
+		}
+	}
 
 	items := addService(questions, servicesTmpl, serviceModulePath, data, false, templatesFS)
 	if len(items) == 0 {
@@ -73,7 +79,8 @@ func addService(
 	serviceModulePath string,
 	data model.ModuleData,
 	isNewProject bool,
-	templatesFS embed.FS) []int {
+	templatesFS embed.FS,
+) []int {
 	var functions []string
 	var items []int
 	for _, q := range questions {
