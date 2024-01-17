@@ -21,6 +21,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", tea.KeyEsc.String(), tea.KeyEscape.String():
+			current.Input.SetExited()
 			return m, tea.Quit
 
 		case "enter":

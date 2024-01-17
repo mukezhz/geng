@@ -9,9 +9,10 @@ import (
 
 type CheckBoxField struct {
 	selected map[int]any
+	title    string
 	choices  []string
 	cursor   int
-	title    string
+	exited   bool
 }
 
 func NewCheckBoxField(t string, choices []string) *CheckBoxField {
@@ -71,7 +72,7 @@ func (m *CheckBoxField) View() string {
 		if _, ok := m.selected[i]; ok {
 			checked = "x"
 		}
-		var style = lipgloss.NewStyle().
+		style := lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#FAFAFA")).
 			Background(lipgloss.Color("#7D56F4")).
@@ -85,7 +86,6 @@ func (m *CheckBoxField) View() string {
 
 	// Send the UI for rendering
 	return s
-
 }
 
 func (m *CheckBoxField) Focus() tea.Cmd {
@@ -93,7 +93,6 @@ func (m *CheckBoxField) Focus() tea.Cmd {
 }
 
 func (a *CheckBoxField) SetValue(s string) {
-
 }
 
 func (a *CheckBoxField) Blur() tea.Msg {
@@ -106,4 +105,12 @@ func (a *CheckBoxField) Value() string {
 
 func (a *CheckBoxField) Selected() map[int]any {
 	return a.selected
+}
+
+func (a *CheckBoxField) SetExited() {
+	a.exited = true
+}
+
+func (a *CheckBoxField) Exited() bool {
+	return a.exited
 }

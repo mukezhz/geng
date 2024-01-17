@@ -48,6 +48,10 @@ func createModule(_ *cobra.Command, args []string) {
 			case constant.ModueleNameKEY:
 				moduleName = q.Answer
 			}
+			if q.Input.Exited() {
+				color.Redln("exited without completing...")
+				return
+			}
 		}
 	} else {
 		moduleName = args[1]

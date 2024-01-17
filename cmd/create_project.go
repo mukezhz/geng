@@ -61,6 +61,10 @@ func createProject(cmd *cobra.Command, args []string) {
 			case constant.DirectoryKEY:
 				directory = q.Answer
 			}
+			if q.Input.Exited() {
+				color.Redln("exited without completing...")
+				return
+			}
 		}
 	} else {
 		projectName = args[0]
