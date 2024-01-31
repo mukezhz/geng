@@ -7,10 +7,11 @@ import (
 var Module = fx.Module("hello",
 	fx.Options(
 		fx.Provide(
-			NewHelloService,
-			NewHelloController,
-      		NewHelloRepository,
+			NewService,
+			NewController,
+      		NewRepository,
+			NewRoute,
 		),
-		fx.Invoke(NewHelloRoute),
+		fx.Invoke(RegisterRoute),
 	),
 )

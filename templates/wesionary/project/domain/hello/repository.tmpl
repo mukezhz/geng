@@ -1,12 +1,12 @@
 package hello
 
-type HelloRepository struct {
+type Repository struct {
 }
 
-func NewHelloRepository() *HelloRepository {
-	return &HelloRepository{}
+func NewRepository() *Repository {
+	return &Repository{}
 }
 
-func (s *HelloRepository) GetMessage() HelloModel {
-	return HelloModel{Message: "Hello World"}
+func (s *Repository) GetMessage() Model {
+	return Model{Message: "Hello World"}
 }

@@ -1,19 +1,19 @@
 package {{.PackageName}}
 
-// {{.ModuleName}}Service handles the business logic of the {{.ModuleName}} module
-type {{.ModuleName}}Service struct {
+// Service handles the business logic of the  module
+type Service struct {
 	// Add any dependencies here
-	repo *{{.ModuleName}}Repository
+	repo *Repository
 }
 
-// New{{.ModuleName}}Service creates a new instance of TestService
-func New{{.ModuleName}}Service(repo *{{.ModuleName}}Repository) *{{.ModuleName}}Service {
-	return &{{.ModuleName}}Service{
+// NewService creates a new instance of TestService
+func NewService(repo *Repository) *Service {
+	return &Service{
 		repo: repo,
 	}
 }
 
 // GetMessage returns a greeting message
-func (s *{{.ModuleName}}Service) GetMessage() {{.ModuleName}}Model {
+func (s *Service) GetMessage() Model {
 	return s.repo.GetMessage()
 }

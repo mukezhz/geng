@@ -5,15 +5,15 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-type HelloController struct {
-    service *HelloService
+type Controller struct {
+    service *Service
 }
 
-func NewHelloController(service *HelloService) *HelloController {
-    return &HelloController{service: service}
+func NewController(service *Service) *Controller {
+    return &Controller{service: service}
 }
 
-func (ctrl *HelloController) HandleRoot(c *gin.Context) {
+func (ctrl *Controller) HandleRoot(c *gin.Context) {
     message := ctrl.service.GetMessage()
     c.JSON(http.StatusOK, gin.H{"message": message.Message})
 }

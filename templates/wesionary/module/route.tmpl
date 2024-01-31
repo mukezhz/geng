@@ -5,19 +5,18 @@ import (
   "{{.ProjectModuleName}}/pkg/infrastructure"
 )
 
-type {{.ModuleName}}Route struct {
+type Route struct {
     router *infrastructure.Router
-    controller *{{.ModuleName}}Controller
+    controller *Controller
     groupRouter *gin.RouterGroup
 }
 
-func New{{.ModuleName}}Route(router *infrastructure.Router, controller *{{.ModuleName}}Controller) *{{.ModuleName}}Route {
-	route := {{.ModuleName}}Route{router: router, controller: controller}
+func NewRoute(router *infrastructure.Router, controller *Controller) *Route {
+	route := Route{router: router, controller: controller}
   route.groupRouter = router.Group("api/{{.PackageName}}")
-	route.RegisterHelloRoutes()
 	return &route
 }
 
-func (r *{{.ModuleName}}Route) RegisterHelloRoutes() {
+func RegisterRoute(r *Route) {
 	r.groupRouter.GET("", r.controller.HandleRoot)
 }

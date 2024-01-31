@@ -1,19 +1,19 @@
 package hello
 
-// HelloService handles the business logic of the Hello module
-type HelloService struct {
+// Service handles the business logic of the module
+type Service struct {
 	// Add any dependencies here
-	repo *HelloRepository
+	repo *Repository
 }
 
-// NewHelloService creates a new instance of TestService
-func NewHelloService(repo *HelloRepository) *HelloService {
-	return &HelloService{
+// NewService creates a new instance of TestService
+func NewService(repo *Repository) *Service {
+	return &Service{
 		repo: repo,
 	}
 }
 
 // GetMessage returns a greeting message
-func (s *HelloService) GetMessage() HelloModel {
+func (s *Service) GetMessage() Model {
 	return s.repo.GetMessage()
 }
