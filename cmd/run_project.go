@@ -22,9 +22,7 @@ func runProject(_ *cobra.Command, args []string) {
 }
 
 func init() {
-	newProjectCmd.Flags().StringP("mod", "m", "", "features name")
-	newProjectCmd.Flags().StringP("dir", "d", "", "target directory")
-	newProjectCmd.Flags().StringP("version", "v", "", "version support")
+	setupFlagsForNewProject(newProjectCmd)
 	rootCmd.AddCommand(newModuleCmd)
 	rootCmd.AddCommand(newProjectCmd)
 	rootCmd.AddCommand(runProjectCmd)

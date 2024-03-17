@@ -19,6 +19,12 @@ var newProjectCmd = &cobra.Command{
 	Run:   createProject,
 }
 
+func setupFlagsForNewProject(cmd *cobra.Command) {
+	cmd.Flags().StringP("mod", "m", "", "module name")
+	cmd.Flags().StringP("dir", "d", "", "target directory")
+	cmd.Flags().StringP("version", "v", "", "version support: Default: 1.20")
+}
+
 func createProject(cmd *cobra.Command, args []string) {
 	var projectName string
 	var projectModuleName string
@@ -79,7 +85,7 @@ func createProject(cmd *cobra.Command, args []string) {
 		return
 	}
 	if projectModuleName == "" {
-		color.Redln("Error: module name is required")
+		color.Redln("Error: golang module name is required")
 		return
 	}
 
