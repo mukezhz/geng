@@ -11,7 +11,7 @@ services:
     volumes:
       - .:/clean_web
     env_file: .env
-    container_name: clean-web
+    container_name: {{.PackageName}}
     security_opt:
       - seccomp:unconfined
     extra_hosts:
