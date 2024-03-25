@@ -3,7 +3,6 @@ package commands
 import (
 	"{{.ProjectModuleName}}/pkg/framework"
 	"{{.ProjectModuleName}}/seeds"
-	"errors"
 
 	"github.com/spf13/cobra"
 )
@@ -35,43 +34,18 @@ func (s *SeedCommand) Setup(cmd *cobra.Command) {
 func (s *SeedCommand) Run() framework.CommandRunner {
 	return func(
 		l framework.Logger,
-		seeds seeds.Seeds,
+		seeder *seeds.Seeder,
 	) {
-
-		// run all seeds
+		l.Info("Running seed command", s.names, s.runAll)
 		if s.runAll {
-			for _, seed := range seeds {
-				seed.Setup()
+			if err := seeder.Exec(nil, true); err != nil {
+				l.Fatal(err)
 			}
 			return
 		}
-
-		// validate names array
-		if len(s.names) == 0 {
-			l.Info("no seed name provided")
-			return
+		if err := seeder.Exec(s.names, false); err != nil {
+			l.Fatal(err)
 		}
 
-		// run selected seeds
-		for _, name := range s.names {
-			if err := runSeed(name, &seeds); err != nil {
-				l.Infof("Error running %s: %s", name, err)
-			}
-		} // end for loop
-	} // end return func
-} // end run func
-
-func runSeed(name string, seeds *seeds.Seeds) error {
-	isValid := false
-	for _, seed := range *seeds {
-		if name == seed.Name() {
-			isValid = true
-			seed.Setup()
-		}
-	} // end for loop
-
-	if !isValid {
-		return errors.New("invalid seed name")
 	}
-	return nil
-} // end runSeed func
+}
