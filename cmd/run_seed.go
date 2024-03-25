@@ -6,16 +6,23 @@ import (
 )
 
 var seedProjectCmd = &cobra.Command{
-	Use:   "seed [project name]",
+	Use:   "seed",
 	Short: "Seed the project",
-	Args:  cobra.MaximumNArgs(1),
 	Run:   seedProject,
 }
 
 func seedProject(_ *cobra.Command, args []string) {
 	program := "go"
-	commands := []string{"run", "main.go", "seed"}
+	commands := []string{"run", "main.go", "seed:run"}
 	// execute command from golang
+	if len(args) == 0 || (len(args) == 1 && args[0] == "all") {
+		commands = append(commands, "--all")
+	} else {
+		for _, arg := range args {
+			commands = append(commands, "--name")
+			commands = append(commands, arg)
+		}
+	}
 	err := utility.ExecuteCommand(program, commands, args...)
 	if err != nil {
 		return

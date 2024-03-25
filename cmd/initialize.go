@@ -9,4 +9,5 @@ func init() {
 	rootCmd.AddCommand(addServiceCmd)
 	rootCmd.AddCommand(seedProjectCmd)
 	rootCmd.AddCommand(startProjectCmd)
+	rootCmd.AddCommand(migrationProjectCmd)
 }
