@@ -7,19 +7,33 @@ import (
 
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
+	"github.com/mukezhz/geng/pkg/model"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
 	"github.com/spf13/cobra"
 )
 
 var newModuleCmd = &cobra.Command{
-	Use:   "gen module [name]",
+	Use:   "gen mod [name]",
 	Short: "Create a new domain",
-	Args:  cobra.MaximumNArgs(2),
-	Run:   createModule,
+	Long: `
+Create a new module|service|middleware in the project.
+Example: 
+  geng gen mod [name]
+  geng gen srv [name]
+  geng gen mid [name]
+
+Default:
+  geng gen -> geng gen mod
+	`,
+	Args: cobra.MaximumNArgs(2),
+	Run:  generate,
 }
 
-func createModule(_ *cobra.Command, args []string) {
+func generate(_ *cobra.Command, args []string) {
+	if len(args) == 0 {
+		args = append(args, "module")
+	}
 	projectModule, err := utility.GetModuleNameFromGoModFile()
 	if err != nil {
 		fmt.Println("Error finding Module name from go.mod:", err)
@@ -35,6 +49,12 @@ func createModule(_ *cobra.Command, args []string) {
 		fmt.Println("Error finding Git root:", err)
 		return
 	}
+	// Define the directory structure
+	generateModule(projectPath, args, projectModule)
+
+}
+
+func generateModule(projectPath string, args []string, projectModule model.GoMod) {
 	mainModulePath := filepath.Join(projectPath, "domain", "module.go")
 	var moduleName string
 	if len(args) == 1 {
@@ -50,7 +70,7 @@ func createModule(_ *cobra.Command, args []string) {
 			}
 			if q.Input.Exited() {
 				color.Redln("exited without completing...")
-				return
+
 			}
 		}
 	} else {
@@ -62,11 +82,10 @@ func createModule(_ *cobra.Command, args []string) {
 	}
 	data := utility.GetModuleDataFromModuleName(moduleName, projectModule.Module, projectModule.GoVersion)
 
-	// Define the directory structure
 	targetRoot := filepath.Join(".", "domain", data.PackageName)
 	templatePath := filepath.Join(".", "templates", "wesionary", "module")
 
-	err = utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)
+	err := utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)
 	if err != nil {
 		color.Redln("Error: generate file", err)
 		return
@@ -76,4 +95,5 @@ func createModule(_ *cobra.Command, args []string) {
 	utility.WriteContentToPath(mainModulePath, updatedCode)
 
 	utility.PrintColorizeModuleDetail(data)
+
 }

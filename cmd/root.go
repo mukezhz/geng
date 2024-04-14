@@ -7,16 +7,10 @@ import (
 )
 
 var (
-	// Used for flags.
-	cfgFile     string
-	userLicense string
-
 	rootCmd = &cobra.Command{
-		Use:   "cobra-cli",
+		Use:   "geng",
 		Short: "A generator for Cobra based Applications",
-		Long: `Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+		Long:  `geng is a CLI library for Go that empowers applications.`,
 	}
 	templatesFS embed.FS
 )
