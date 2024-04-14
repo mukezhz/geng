@@ -25,3 +25,13 @@ func runProject(_ *cobra.Command, args []string) {
 		return
 	}
 }
+
+func init() {
+	setupFlagsForNewProject(newProjectCmd)
+	rootCmd.AddCommand(newModuleCmd)
+	rootCmd.AddCommand(newProjectCmd)
+	rootCmd.AddCommand(runProjectCmd)
+	rootCmd.AddCommand(addInfrastructureCmd)
+	rootCmd.AddCommand(addServiceCmd)
+	rootCmd.AddCommand(generateFxCmd)
+}
