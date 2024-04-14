@@ -34,7 +34,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	var directory string
 	var questions []terminal.ProjectQuestion
 
-	templateInfraPath := filepath.Join(".", "templates", "wesionary", "infrastructure")
+	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure"))
 	infrasTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
 	infras := utility.Map[string, string](infrasTmpl, func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
@@ -99,7 +99,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	}
 	targetRoot := data.Directory
 
-	templatePath := filepath.Join("templates", "wesionary", "project")
+	templatePath := utility.IgnoreWindowsPath(filepath.Join("templates", "wesionary", "project"))
 	err := utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)
 	if err != nil {
 		color.Redln("Error generate file", err)

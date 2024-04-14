@@ -43,7 +43,7 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		return
 	}
 	infrastructureModulePath := filepath.Join(projectPath, "pkg", "infrastructure", "module.go")
-	templateInfraPath := filepath.Join(".", "templates", "wesionary", "infrastructure")
+	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure"))
 	infrasTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
 	infras := utility.Map[string, string](infrasTmpl, func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
@@ -89,7 +89,7 @@ func addInfrastructure(
 			selected := q.Input.Selected()
 			for s := range selected {
 				functions = append(functions,
-					utility.GetFunctionDeclarations(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s]), templatesFS)...,
+					utility.GetFunctionDeclarations(utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s])), templatesFS)...,
 				)
 				items = append(items, s)
 			}
@@ -103,7 +103,7 @@ func addInfrastructure(
 
 	servicesTmplMap := make(map[string]bool)
 	for _, i := range items {
-		templatePath := filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[i])
+		templatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[i]))
 		var targetRoot string
 		if isNewProject {
 			if data.Directory == "" {
@@ -116,7 +116,7 @@ func addInfrastructure(
 		}
 
 		fileName := strings.Replace(infrasTmpl[i], ".tmpl", "", 1)
-		serviceTemplatePath := filepath.Join(".", "templates", "wesionary", "service")
+		serviceTemplatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service"))
 		for _, file := range utility.ListDirectory(templatesFS, serviceTemplatePath) {
 			if strings.Contains(file, fileName) {
 				servicesTmplMap[file] = true

@@ -83,7 +83,7 @@ func generateModule(projectPath string, args []string, projectModule model.GoMod
 	data := utility.GetModuleDataFromModuleName(moduleName, projectModule.Module, projectModule.GoVersion)
 
 	targetRoot := filepath.Join(".", "domain", data.PackageName)
-	templatePath := filepath.Join(".", "templates", "wesionary", "module")
+	templatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "module"))
 
 	err := utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)
 	if err != nil {

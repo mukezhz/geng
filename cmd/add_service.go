@@ -43,7 +43,7 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 		return
 	}
 	serviceModulePath := filepath.Join(projectPath, "pkg", "services", "module.go")
-	templateInfraPath := filepath.Join(".", "templates", "wesionary", "service")
+	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service"))
 	servicesTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
 	services := utility.Map[string, string](servicesTmpl, func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
@@ -88,7 +88,7 @@ func addService(
 		case constant.ServiceNameKEY:
 			selected := q.Input.Selected()
 			for s := range selected {
-				funcs := utility.GetFunctionDeclarations(filepath.Join(".", "templates", "wesionary", "service", servicesTmpl[s]), templatesFS)
+				funcs := utility.GetFunctionDeclarations(utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service", servicesTmpl[s])), templatesFS)
 				filteredServices := utility.Filter[string](funcs, func(q string) bool {
 					return strings.Contains(q, "New")
 				})
@@ -99,7 +99,7 @@ func addService(
 			}
 		case constant.InfrastructureNameKEY:
 			for i, s := range servicesTmpl {
-				funcs := utility.GetFunctionDeclarations(filepath.Join(".", "templates", "wesionary", "service", s), templatesFS)
+				funcs := utility.GetFunctionDeclarations(utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service", s)), templatesFS)
 				filteredServices := utility.Filter[string](funcs, func(q string) bool {
 					return strings.Contains(q, "New")
 				})
@@ -118,7 +118,7 @@ func addService(
 	utility.WriteContentToPath(serviceModulePath, updatedCode)
 
 	for _, i := range items {
-		templatePath := filepath.Join(".", "templates", "wesionary", "service", servicesTmpl[i])
+		templatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service", servicesTmpl[i]))
 		var targetRoot string
 		if isNewProject {
 			targetRoot = filepath.Join(data.PackageName, "pkg", "services", strings.Replace(servicesTmpl[i], ".tmpl", ".go", 1))
