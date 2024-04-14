@@ -28,4 +28,5 @@ func init() {
 	rootCmd.AddCommand(runProjectCmd)
 	rootCmd.AddCommand(addInfrastructureCmd)
 	rootCmd.AddCommand(addServiceCmd)
+	rootCmd.AddCommand(generateFxCmd)
 }
