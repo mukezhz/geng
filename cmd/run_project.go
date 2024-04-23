@@ -8,14 +8,19 @@ import (
 var runProjectCmd = &cobra.Command{
 	Use:   "run [project name]",
 	Short: "Run the project",
-	Args:  cobra.MaximumNArgs(1),
-	Run:   runProject,
+	Long: `
+Run the project:
+Alias to "go run main.go"
+	`,
+	Args: cobra.MaximumNArgs(1),
+	Run:  runProject,
 }
 
 func runProject(_ *cobra.Command, args []string) {
-	runGo := "go"
+	program := "go"
+	commands := []string{"run", "main.go"}
 	// execute command from golang
-	err := utility.ExecuteCommand(runGo, args...)
+	err := utility.ExecuteCommand(program, commands, args...)
 	if err != nil {
 		return
 	}
