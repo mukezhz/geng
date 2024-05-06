@@ -1,21 +1,26 @@
 package cmd
 
 import (
-	"embed"
-
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd = &cobra.Command{
-		Use:   "geng",
-		Short: "A generator for Cobra based Applications",
-		Long:  `geng is a CLI library for Go that empowers applications.`,
-	}
-	templatesFS embed.FS
-)
+// Root is the root of the command execution.
+// root can be thought of as a main program.
+var Root = &cobra.Command{
+	Use:   "geng",
+	Short: "A generator for Cobra based Applications",
+	Long:  `geng is a CLI library for Go that empowers applications.`,
+}
 
-func Execute(fs embed.FS) error {
-	templatesFS = fs
-	return rootCmd.Execute()
+func init() {
+	Root.AddCommand(
+		newModuleCmd,
+		newProjectCmd,
+		runProjectCmd,
+		addInfrastructureCmd,
+		addServiceCmd,
+		seedProjectCmd,
+		startProjectCmd,
+		migrationProjectCmd,
+	)
 }

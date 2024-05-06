@@ -5,14 +5,14 @@ import (
 	"os/exec"
 )
 
-func ExecuteCommand(command string, args ...string) error {
+func ExecuteCommand(program string, commands []string, args ...string) error {
 	var cmd *exec.Cmd
-	runCommand := []string{"run", "main.go"}
+	runCommand := commands
 	if len(args) == 0 {
-		cmd = exec.Command(command, runCommand...)
+		cmd = exec.Command(program, runCommand...)
 	} else {
 		runCommand = append(runCommand, args...)
-		cmd = exec.Command(command, runCommand...)
+		cmd = exec.Command(program, runCommand...)
 	}
 
 	cmd.Dir = "." // Ensure this is correct

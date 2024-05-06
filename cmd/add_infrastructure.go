@@ -11,6 +11,7 @@ import (
 	"github.com/mukezhz/geng/pkg/model"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
+	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -44,7 +45,7 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 	}
 	infrastructureModulePath := filepath.Join(projectPath, "pkg", "infrastructure", "module.go")
 	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure"))
-	infrasTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
+	infrasTmpl := utility.ListDirectory(templates.FS, templateInfraPath)
 	infras := utility.Map[string, string](infrasTmpl, func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
 	})
@@ -60,7 +61,7 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		}
 	}
 
-	items := addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, false, templatesFS)
+	items := addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, false, templates.FS)
 	if len(items) == 0 {
 		color.Red.Println("No infrastructure selected")
 		return

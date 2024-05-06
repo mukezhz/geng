@@ -5,7 +5,6 @@ import (
     "{{.ProjectModuleName}}/pkg/framework"
     "{{.ProjectModuleName}}/pkg/infrastructure"
     "{{.ProjectModuleName}}/pkg/middlewares"
-    "{{.ProjectModuleName}}/seeds"
 
     "github.com/getsentry/sentry-go"
     "github.com/spf13/cobra"
@@ -26,8 +25,6 @@ func (s *ServeCommand) Run() framework.CommandRunner {
             env *framework.Env,
             router *infrastructure.Router,
             logger framework.Logger,
-            seeds seeds.Seeds,
-
     ) {
         logger.Info(`+-----------------------+`)
         logger.Info(`| GO CLEAN ARCHITECTURE |`)
@@ -38,7 +35,6 @@ func (s *ServeCommand) Run() framework.CommandRunner {
         time.Local = loc
 
         middleware.Setup()
-        seeds.Setup()
 
         if env.Environment != "local" && env.SentryDSN != "" {
             err := sentry.Init(sentry.ClientOptions{
