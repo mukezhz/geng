@@ -1,17 +1,14 @@
 package main
 
 import (
-	"embed"
 	"os"
 
 	"github.com/mukezhz/geng/cmd"
 )
 
-//go:embed templates/wesionary/*
-var templatesFS embed.FS
-
 func main() {
-	if err := cmd.Execute(templatesFS); err != nil {
+  // execute the root command
+	if err := cmd.Root.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
