@@ -2,5 +2,5 @@ package templates
 
 import "embed"
 
-//go:embed wesionary/*
+//go:embed templates/*
 var FS embed.FS
