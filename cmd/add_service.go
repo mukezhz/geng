@@ -11,6 +11,7 @@ import (
 	"github.com/mukezhz/geng/pkg/model"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
+	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -44,7 +45,7 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 	}
 	serviceModulePath := filepath.Join(projectPath, "pkg", "services", "module.go")
 	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service"))
-	servicesTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
+	servicesTmpl := utility.ListDirectory(templates.FS, templateInfraPath)
 	services := utility.Map[string, string](servicesTmpl, func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
 	})
@@ -61,7 +62,7 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 		}
 	}
 
-	items := addService(questions, servicesTmpl, serviceModulePath, data, false, templatesFS)
+	items := addService(questions, servicesTmpl, serviceModulePath, data, false, templates.FS)
 	if len(items) == 0 {
 		color.Red.Println("No Service selected")
 		return

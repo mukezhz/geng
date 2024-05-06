@@ -10,6 +10,7 @@ import (
 	"github.com/mukezhz/geng/pkg/model"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
+	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -85,7 +86,7 @@ func generateModule(projectPath string, args []string, projectModule model.GoMod
 	targetRoot := filepath.Join(".", "domain", data.PackageName)
 	templatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "module"))
 
-	err := utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)
+	err := utility.GenerateFiles(templates.FS, templatePath, targetRoot, data)
 	if err != nil {
 		color.Redln("Error: generate file", err)
 		return

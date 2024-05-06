@@ -9,6 +9,7 @@ import (
 	"github.com/mukezhz/geng/pkg/constant"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
+	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +20,10 @@ var newProjectCmd = &cobra.Command{
 	Run:   createProject,
 }
 
-func setupFlagsForNewProject(cmd *cobra.Command) {
-	cmd.Flags().StringP("mod", "m", "", "module name")
-	cmd.Flags().StringP("dir", "d", "", "target directory")
-	cmd.Flags().StringP("version", "v", "", "version support: Default: 1.20")
+func init() {
+	newProjectCmd.Flags().StringP("mod", "m", "", "module name")
+	newProjectCmd.Flags().StringP("dir", "d", "", "target directory")
+	newProjectCmd.Flags().StringP("version", "v", "", "version support: Default: 1.20")
 }
 
 func createProject(cmd *cobra.Command, args []string) {
@@ -35,7 +36,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	var questions []terminal.ProjectQuestion
 
 	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure"))
-	infrasTmpl := utility.ListDirectory(templatesFS, templateInfraPath)
+	infrasTmpl := utility.ListDirectory(templates.FS, templateInfraPath)
 	infras := utility.Map[string, string](infrasTmpl, func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
 	})
@@ -100,7 +101,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	targetRoot := data.Directory
 
 	templatePath := utility.IgnoreWindowsPath(filepath.Join("templates", "wesionary", "project"))
-	err := utility.GenerateFiles(templatesFS, templatePath, targetRoot, data)
+	err := utility.GenerateFiles(templates.FS, templatePath, targetRoot, data)
 	if err != nil {
 		color.Redln("Error generate file", err)
 		return
@@ -109,7 +110,7 @@ func createProject(cmd *cobra.Command, args []string) {
 		switch q.Key {
 		case constant.InfrastructureNameKEY:
 			infrastructureModulePath := filepath.Join(data.PackageName, "pkg", "infrastructure", "module.go")
-			addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, true, templatesFS)
+			addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, true, templates.FS)
 		}
 	}
 
