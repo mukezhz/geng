@@ -2,7 +2,6 @@ package gen
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -56,8 +55,6 @@ func (g *InfraGenerator) Generate(
 	if len(items) == 0 {
 		return nil
 	}
-
-  fmt.Println(functions)
 
 	updatedCode := utility.AddListOfProvideInFxOptions(g.modPath, functions)
 	utility.WriteContentToPath(g.modPath, updatedCode)
