@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
@@ -31,7 +32,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	var questions []terminal.ProjectQuestion
 
 	infraGen := gen.InfraGenerator{Directory: "."}
-	infras, infrasTmpl := infraGen.PathGen()
+	choice := infraGen.GetChoices()
 
 	if len(args) == 0 {
 		questions = []terminal.ProjectQuestion{
@@ -41,7 +42,7 @@ func createProject(cmd *cobra.Command, args []string) {
 			terminal.NewLongQuestion(constant.ProjectDescriptionKEY, constant.ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
 			terminal.NewShortQuestion(constant.GoVersionKEY, constant.GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
 			terminal.NewShortQuestion(constant.DirectoryKEY, constant.Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
-			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", infras),
+			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", choice.Items),
 		}
 
 		terminal.StartInteractiveTerminal(questions)
@@ -76,24 +77,17 @@ func createProject(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// TODO: refactor, selected items generation logic from question generation
 	var selectedItems []int
-	var selectedFunctions []string
-	var selectedInfras []string
 	for _, q := range questions {
 		if q.Key == constant.InfrastructureNameKEY {
 			selected := q.Input.Selected()
 			for s := range selected {
-				funcPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s]))
-				funcDecl := utility.GetFunctionDeclarations(funcPath, templates.FS)
-				selectedFunctions = append(selectedFunctions, funcDecl...)
 				selectedItems = append(selectedItems, s)
-				selectedInfras = append(selectedInfras, infras[s])
 			}
 		}
 	}
 
-  infraGen.Directory = data.Directory
+	infraGen.Directory = data.Directory
 	if err := infraGen.Validate(); err != nil {
 		color.Red.Println(err)
 		return
@@ -104,16 +98,29 @@ func createProject(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	servicesTmplMap := infraGen.Generate(*data, selectedItems, selectedFunctions)
-	serviceModulePath := filepath.Join(data.PackageName, "pkg", "services", "module.go")
-
-	var servicesTmpl []string
-	for k := range servicesTmplMap {
-		servicesTmpl = append(servicesTmpl, k)
+	if err := infraGen.Generate(*data, selectedItems); err != nil {
+		color.Red.Printf("Generation error: %v\n", err)
+		return
 	}
 
+	// TODO: refactor service generation logic
+	var servicesTmpl []string
+	for _, item := range selectedItems {
+		currTemplate := choice.Templates[item]
+		fileName := strings.Replace(currTemplate, ".tmpl", "", 1)
+		serviceTemplatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service"))
+		for _, file := range utility.ListDirectory(templates.FS, serviceTemplatePath) {
+			// weird logic for now
+			if strings.Contains(file, fileName) {
+				servicesTmpl = append(servicesTmpl, file)
+			}
+		}
+	}
+
+	serviceModulePath := filepath.Join(data.Directory, "pkg", "services", "module.go")
 	addService(questions, servicesTmpl, serviceModulePath, *data, true, templates.FS)
 
+	selectedInfras := infraGen.GetSelectedItems(selectedItems)
 	utility.PrintColorizeInfrastructureDetail(*data, selectedInfras)
 
 }
