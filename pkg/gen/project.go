@@ -19,6 +19,9 @@ type ProjectGenerator struct {
 	Author      string
 	Directory   string
 	GoVersion   string
+
+	// InfraGen infrastructure generation during project creation
+	InfraGen *InfraGenerator
 }
 
 // Fill fills up items from map to the struct
