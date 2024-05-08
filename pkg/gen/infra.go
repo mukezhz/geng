@@ -2,7 +2,6 @@ package gen
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -93,8 +92,6 @@ func (g *InfraGenerator) Generate(
 	}
 
 	updatedCode := utility.AddListOfProvideInFxOptions(g.modPath, functions)
-	fmt.Println(functions)
-	fmt.Println(updatedCode)
 	utility.WriteContentToPath(g.modPath, updatedCode)
 
 	// servicesTmplMap := make(map[string]bool)
