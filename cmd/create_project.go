@@ -5,7 +5,6 @@ import (
 	"github.com/mukezhz/geng/pkg/constant"
 	"github.com/mukezhz/geng/pkg/gen"
 	"github.com/mukezhz/geng/pkg/terminal"
-	"github.com/mukezhz/geng/pkg/utility"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +15,11 @@ var projectCmd = &cobra.Command{
 	Run:   createProject,
 }
 
-var projectGen = gen.ProjectGenerator{}
+var projectGen = gen.ProjectGenerator{
+	Infra: &gen.InfraGenerator{
+		Directory: ".",
+	},
+}
 
 func init() {
 	projectCmd.Flags().StringVarP(&projectGen.ModuleName, "mod", "m", "", "module name")
@@ -26,9 +29,7 @@ func init() {
 
 func createProject(cmd *cobra.Command, args []string) {
 	var questions []terminal.ProjectQuestion
-
-	infraGen := gen.InfraGenerator{Directory: "."}
-	choice := infraGen.GetChoices()
+	choice := projectGen.Infra.GetChoices()
 
 	if len(args) == 0 {
 		questions = []terminal.ProjectQuestion{
@@ -67,12 +68,6 @@ func createProject(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	data, err := projectGen.Generate()
-	if err != nil {
-		color.Redln(err.Error())
-		return
-	}
-
 	var selectedItems []int
 	for _, q := range questions {
 		if q.Key == constant.InfrastructureNameKEY {
@@ -83,33 +78,9 @@ func createProject(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	infraGen.Directory = data.Directory
-	if err := infraGen.Validate(); err != nil {
-		color.Red.Println(err)
+	if err := projectGen.Generate(selectedItems); err != nil {
+		color.Redln(err.Error())
 		return
 	}
-
-	if len(selectedItems) == 0 {
-		color.Red.Println("No infrastructure selected")
-		return
-	}
-
-	selectedInfras := infraGen.GetSelectedItems(selectedItems)
-	if err := infraGen.Generate(*data, selectedItems); err != nil {
-		color.Red.Printf("Generation error: %v\n", err)
-		return
-	}
-
-	serviceGen := gen.ServiceGenerator{
-		Directory: data.Directory,
-	}
-	selectedItems = serviceGen.SimilarChoice(selectedInfras)
-
-	if err := serviceGen.Generate(*data, selectedItems); err != nil {
-		color.Red.Printf("Generation error: %v\n", err)
-		return
-	}
-
-	utility.PrintColorizeInfrastructureDetail(*data, selectedInfras)
 
 }

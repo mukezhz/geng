@@ -2,6 +2,7 @@ package gen
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -17,6 +18,8 @@ type InfraGenerator struct {
 	infraPath string
 
 	choice *InfraChoice
+
+	Service *ServiceGenerator
 }
 
 type InfraChoice struct {
@@ -42,6 +45,8 @@ func (i *InfraGenerator) GetChoices() *InfraChoice {
 		Items:     items,
 		Templates: templates,
 	}
+
+	i.Service = &ServiceGenerator{Directory: i.Directory}
 
 	return i.choice
 }
@@ -102,6 +107,13 @@ func (g *InfraGenerator) Generate(
 		targetRoot := filepath.Join(data.Directory, "pkg", "infrastructure", strings.Replace(currTemplate, ".tmpl", ".go", 1))
 
 		utility.GenerateFromEmbeddedTemplate(templates.FS, templatePath, targetRoot, data)
+	}
+
+	selectedInfra := g.GetSelectedItems(selectedItems)
+	selectedItems = g.Service.SimilarChoice(selectedInfra)
+
+	if err := g.Service.Generate(data, selectedItems); err != nil {
+		return fmt.Errorf("Generation error: %v\n", err)
 	}
 
 	return nil

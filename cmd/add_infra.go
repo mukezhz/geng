@@ -86,15 +86,5 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		return
 	}
 
-	serviceGen := gen.ServiceGenerator{
-		Directory: projectPath,
-	}
-	selectedItems = serviceGen.SimilarChoice(selected)
-
-	if err := serviceGen.Generate(data, selectedItems); err != nil {
-		color.Red.Printf("Generation error: %v\n", err)
-		return
-	}
-
 	utility.PrintColorizeInfrastructureDetail(data, selected)
 }
