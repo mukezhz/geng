@@ -70,7 +70,6 @@ func (p *ProjectGenerator) Generate(selectedInfra []int) error {
 	utility.PrintColorizeProjectDetail(data)
 	fmt.Println("")
 
-	p.Infra.Directory = data.Directory
 	if err := p.Infra.Validate(); err != nil {
 		return err
 	}
