@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/mukezhz/geng/pkg/constant"
-	"github.com/mukezhz/geng/pkg/model"
 	"github.com/mukezhz/geng/pkg/utility"
 	"github.com/mukezhz/geng/templates"
 )
@@ -19,6 +18,8 @@ type ProjectGenerator struct {
 	Author      string
 	Directory   string
 	GoVersion   string
+
+	Infra *InfraGenerator
 }
 
 // Fill fills up items from map to the struct
@@ -29,6 +30,10 @@ func (p *ProjectGenerator) Fill(d map[string]string) {
 	p.Description, _ = d[constant.ProjectDescriptionKEY]
 	p.GoVersion, _ = d[constant.GoVersionKEY]
 	p.Directory, _ = d[constant.DirectoryKEY]
+
+	p.Infra = &InfraGenerator{
+		Directory: p.Directory,
+	}
 }
 
 // Validate validates generated project arguments
@@ -44,7 +49,7 @@ func (p *ProjectGenerator) Validate() error {
 }
 
 // Generate genrates the project given the arguments in the struct
-func (p *ProjectGenerator) Generate() (*model.ModuleData, error) {
+func (p *ProjectGenerator) Generate(selectedInfra []int) error {
 	data := utility.GetModuleDataFromModuleName(p.Name, p.ModuleName, p.GoVersion)
 	data.ProjectDescription = p.Description
 	data.Author = p.Author
@@ -59,11 +64,25 @@ func (p *ProjectGenerator) Generate() (*model.ModuleData, error) {
 	templatePath := utility.IgnoreWindowsPath(filepath.Join("templates", "wesionary", "project"))
 	err := utility.GenerateFiles(templates.FS, templatePath, targetRoot, data)
 	if err != nil {
-		return nil, fmt.Errorf("Error generating file: %v", err)
+		return fmt.Errorf("Error generating file: %v", err)
 	}
 
 	utility.PrintColorizeProjectDetail(data)
 	fmt.Println("")
 
-	return &data, nil
+	if err := p.Infra.Validate(); err != nil {
+		return err
+	}
+
+	if len(selectedInfra) == 0 {
+		return errors.New("No infrastructure selected")
+	}
+
+	selectedInfras := p.Infra.GetSelectedItems(selectedInfra)
+	if err := p.Infra.Generate(data, selectedInfra); err != nil {
+		return fmt.Errorf("Generation error: %v\n", err)
+	}
+
+	utility.PrintColorizeInfrastructureDetail(data, selectedInfras)
+	return nil
 }

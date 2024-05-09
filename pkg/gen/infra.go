@@ -2,6 +2,7 @@ package gen
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -15,24 +16,51 @@ type InfraGenerator struct {
 
 	modPath   string
 	infraPath string
-	templates []string
-	infra     []string
+
+	choice *InfraChoice
+
+	Service *ServiceGenerator
 }
 
-// PathGen generates necessary path argument for infrastructure generation
-// genration is carried out with directory argument
-func (i *InfraGenerator) PathGen() ([]string, []string) {
+type InfraChoice struct {
+	Items     []string
+	Templates []string
+}
+
+// GetChoices generates necessary choices for infrastructure selection
+// the generated choices are filled up in the generator struct automatically.
+// returns the available choices as per the templates available.
+func (i *InfraGenerator) GetChoices() *InfraChoice {
 	i.modPath = filepath.Join(i.Directory, "pkg", "infrastructure", "module.go")
 	i.infraPath = utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure"))
-	i.templates = utility.ListDirectory(templates.FS, i.infraPath)
+
+	templates := utility.ListDirectory(templates.FS, i.infraPath)
 
 	replaceFunc := func(q string) string {
 		return strings.Replace(q, ".tmpl", "", 1)
 	}
 
-	i.infra = utility.Map[string, string](i.templates, replaceFunc)
+	items := utility.Map[string, string](templates, replaceFunc)
+	i.choice = &InfraChoice{
+		Items:     items,
+		Templates: templates,
+	}
 
-	return i.infra, i.templates
+	i.Service = &ServiceGenerator{Directory: i.Directory}
+
+	return i.choice
+}
+
+// GetSelectedItems converts selected items (integer) from template into
+// array of strings depending on the choices generated.
+func (i *InfraGenerator) GetSelectedItems(selectedItems []int) []string {
+	retItem := make([]string, len(selectedItems))
+	items := i.GetChoices().Items
+	for i, selectedIndex := range selectedItems {
+		retItem[i] = items[selectedIndex]
+	}
+
+	return retItem
 }
 
 func (i *InfraGenerator) Validate() error {
@@ -46,36 +74,47 @@ func (i *InfraGenerator) Validate() error {
 // TODO: remove dependencies on model, items and functions
 func (g *InfraGenerator) Generate(
 	data model.ModuleData,
-	items []int, // selected items for generation
-	functions []string, // selected functions for generation
-) map[string]bool {
+	selectedItems []int, // selected items for generation
+) error {
 
-	g.PathGen()
+	g.GetChoices()
 
-	if len(items) == 0 {
-		return nil
+	if len(g.choice.Items) == 0 {
+		return errors.New("no choice to choose from, templates mismatch")
+	}
+
+	// nothing choosen by the user
+	if len(selectedItems) == 0 {
+		return errors.New("nothing choosen by the user, skipping")
+	}
+
+	// generate function declarations of selected infrastructures
+	var functions []string
+	for _, index := range selectedItems {
+		funcPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure", g.choice.Templates[index]))
+		funcDecl := utility.GetFunctionDeclarations(funcPath, templates.FS)
+		functions = append(functions, funcDecl...)
 	}
 
 	updatedCode := utility.AddListOfProvideInFxOptions(g.modPath, functions)
 	utility.WriteContentToPath(g.modPath, updatedCode)
 
-	servicesTmplMap := make(map[string]bool)
-	for _, item := range items {
-		currTemplate := g.templates[item]
+	for _, item := range selectedItems {
+		currTemplate := g.choice.Templates[item]
 		templatePath := filepath.Join(".", "templates", "wesionary", "infrastructure", currTemplate)
 		templatePath = utility.IgnoreWindowsPath(templatePath)
 
 		targetRoot := filepath.Join(data.Directory, "pkg", "infrastructure", strings.Replace(currTemplate, ".tmpl", ".go", 1))
 
-		fileName := strings.Replace(currTemplate, ".tmpl", "", 1)
-		serviceTemplatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service"))
-		for _, file := range utility.ListDirectory(templates.FS, serviceTemplatePath) {
-			if strings.Contains(file, fileName) {
-				servicesTmplMap[file] = true
-			}
-		}
 		utility.GenerateFromEmbeddedTemplate(templates.FS, templatePath, targetRoot, data)
 	}
 
-	return servicesTmplMap
+	selectedInfra := g.GetSelectedItems(selectedItems)
+	selectedItems = g.Service.SimilarChoice(selectedInfra)
+
+	if err := g.Service.Generate(data, selectedItems); err != nil {
+		return fmt.Errorf("Generation error: %v\n", err)
+	}
+
+	return nil
 }

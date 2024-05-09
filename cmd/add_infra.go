@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/gookit/color"
@@ -10,7 +9,6 @@ import (
 	"github.com/mukezhz/geng/pkg/gen"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
-	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -49,11 +47,13 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		return
 	}
 
+	// generate in project path
 	infraGen.Directory = projectPath
-	infras, infrasTmpl := infraGen.PathGen()
+
+	choice := infraGen.GetChoices()
 
 	questions := []terminal.ProjectQuestion{
-		terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select]", infras),
+		terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select]", choice.Items),
 	}
 
 	terminal.StartInteractiveTerminal(questions)
@@ -64,41 +64,27 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		}
 	}
 
+	// get selected items from questions
 	var selectedItems []int
-	var selectedFunctions []string
-	var selectedInfras []string
 	for _, q := range questions {
 		if q.Key == constant.InfrastructureNameKEY {
 			selected := q.Input.Selected()
 			for s := range selected {
-				funcPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s]))
-				funcDecl := utility.GetFunctionDeclarations(funcPath, templates.FS)
-				selectedFunctions = append(selectedFunctions, funcDecl...)
 				selectedItems = append(selectedItems, s)
-				selectedInfras = append(selectedInfras, infras[s])
 			}
 		}
 	}
+	selected := infraGen.GetSelectedItems(selectedItems)
 
 	if err := infraGen.Validate(); err != nil {
 		color.Red.Println(err)
 		return
 	}
 
-	if len(selectedItems) == 0 {
-		color.Red.Println("No infrastructure selected")
+	if err := infraGen.Generate(data, selectedItems); err != nil {
+		color.Red.Printf("Generation error: %v\n", err)
 		return
 	}
 
-	servicesTmplMap := infraGen.Generate(data, selectedItems, selectedFunctions)
-	serviceModulePath := filepath.Join(data.PackageName, "pkg", "services", "module.go")
-
-	var servicesTmpl []string
-	for k := range servicesTmplMap {
-		servicesTmpl = append(servicesTmpl, k)
-	}
-
-	addService(questions, servicesTmpl, serviceModulePath, data, true, templates.FS)
-
-	utility.PrintColorizeInfrastructureDetail(data, selectedInfras)
+	utility.PrintColorizeInfrastructureDetail(data, selected)
 }

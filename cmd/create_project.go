@@ -1,14 +1,10 @@
 package cmd
 
 import (
-	"path/filepath"
-
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
 	"github.com/mukezhz/geng/pkg/gen"
 	"github.com/mukezhz/geng/pkg/terminal"
-	"github.com/mukezhz/geng/pkg/utility"
-	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +15,11 @@ var projectCmd = &cobra.Command{
 	Run:   createProject,
 }
 
-var projectGen = gen.ProjectGenerator{}
+var projectGen = gen.ProjectGenerator{
+	Infra: &gen.InfraGenerator{
+		Directory: ".",
+	},
+}
 
 func init() {
 	projectCmd.Flags().StringVarP(&projectGen.ModuleName, "mod", "m", "", "module name")
@@ -29,9 +29,7 @@ func init() {
 
 func createProject(cmd *cobra.Command, args []string) {
 	var questions []terminal.ProjectQuestion
-
-	infraGen := gen.InfraGenerator{Directory: "."}
-	infras, infrasTmpl := infraGen.PathGen()
+	choice := projectGen.Infra.GetChoices()
 
 	if len(args) == 0 {
 		questions = []terminal.ProjectQuestion{
@@ -41,7 +39,7 @@ func createProject(cmd *cobra.Command, args []string) {
 			terminal.NewLongQuestion(constant.ProjectDescriptionKEY, constant.ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
 			terminal.NewShortQuestion(constant.GoVersionKEY, constant.GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
 			terminal.NewShortQuestion(constant.DirectoryKEY, constant.Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
-			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", infras),
+			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", choice.Items),
 		}
 
 		terminal.StartInteractiveTerminal(questions)
@@ -70,50 +68,19 @@ func createProject(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	data, err := projectGen.Generate()
-	if err != nil {
-		color.Redln(err.Error())
-		return
-	}
-
-	// TODO: refactor, selected items generation logic from question generation
 	var selectedItems []int
-	var selectedFunctions []string
-	var selectedInfras []string
 	for _, q := range questions {
 		if q.Key == constant.InfrastructureNameKEY {
 			selected := q.Input.Selected()
 			for s := range selected {
-				funcPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure", infrasTmpl[s]))
-				funcDecl := utility.GetFunctionDeclarations(funcPath, templates.FS)
-				selectedFunctions = append(selectedFunctions, funcDecl...)
 				selectedItems = append(selectedItems, s)
-				selectedInfras = append(selectedInfras, infras[s])
 			}
 		}
 	}
 
-  infraGen.Directory = data.Directory
-	if err := infraGen.Validate(); err != nil {
-		color.Red.Println(err)
+	if err := projectGen.Generate(selectedItems); err != nil {
+		color.Redln(err.Error())
 		return
 	}
-
-	if len(selectedItems) == 0 {
-		color.Red.Println("No infrastructure selected")
-		return
-	}
-
-	servicesTmplMap := infraGen.Generate(*data, selectedItems, selectedFunctions)
-	serviceModulePath := filepath.Join(data.PackageName, "pkg", "services", "module.go")
-
-	var servicesTmpl []string
-	for k := range servicesTmplMap {
-		servicesTmpl = append(servicesTmpl, k)
-	}
-
-	addService(questions, servicesTmpl, serviceModulePath, *data, true, templates.FS)
-
-	utility.PrintColorizeInfrastructureDetail(*data, selectedInfras)
 
 }
