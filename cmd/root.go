@@ -15,10 +15,10 @@ var Root = &cobra.Command{
 func init() {
 	Root.AddCommand(
 		newModuleCmd,
-		newProjectCmd,
+		projectCmd,
 		runProjectCmd,
-		addInfrastructureCmd,
-		addServiceCmd,
+		infraCmd,
+		serviceCmd,
 		seedProjectCmd,
 		startProjectCmd,
 		migrationProjectCmd,

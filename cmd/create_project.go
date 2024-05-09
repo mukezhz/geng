@@ -1,45 +1,35 @@
 package cmd
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
+	"github.com/mukezhz/geng/pkg/gen"
 	"github.com/mukezhz/geng/pkg/terminal"
-	"github.com/mukezhz/geng/pkg/utility"
-	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
-var newProjectCmd = &cobra.Command{
+var projectCmd = &cobra.Command{
 	Use:   "new [project name]",
 	Short: "Create a new project",
 	Args:  cobra.MaximumNArgs(1),
 	Run:   createProject,
 }
 
+var projectGen = gen.ProjectGenerator{
+	Infra: &gen.InfraGenerator{
+		Directory: ".",
+	},
+}
+
 func init() {
-	newProjectCmd.Flags().StringP("mod", "m", "", "module name")
-	newProjectCmd.Flags().StringP("dir", "d", "", "target directory")
-	newProjectCmd.Flags().StringP("version", "v", "", "version support: Default: 1.20")
+	projectCmd.Flags().StringVarP(&projectGen.ModuleName, "mod", "m", "", "module name")
+	projectCmd.Flags().StringVarP(&projectGen.Directory, "dir", "d", "", "target directory")
+	projectCmd.Flags().StringVarP(&projectGen.GoVersion, "version", "v", "", "version support: Default: 1.20")
 }
 
 func createProject(cmd *cobra.Command, args []string) {
-	var projectName string
-	var projectModuleName string
-	var goVersion string
-	var projectDescription string
-	var author string
-	var directory string
 	var questions []terminal.ProjectQuestion
-
-	templateInfraPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "infrastructure"))
-	infrasTmpl := utility.ListDirectory(templates.FS, templateInfraPath)
-	infras := utility.Map[string, string](infrasTmpl, func(q string) string {
-		return strings.Replace(q, ".tmpl", "", 1)
-	})
+	choice := projectGen.Infra.GetChoices()
 
 	if len(args) == 0 {
 		questions = []terminal.ProjectQuestion{
@@ -49,71 +39,48 @@ func createProject(cmd *cobra.Command, args []string) {
 			terminal.NewLongQuestion(constant.ProjectDescriptionKEY, constant.ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
 			terminal.NewShortQuestion(constant.GoVersionKEY, constant.GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
 			terminal.NewShortQuestion(constant.DirectoryKEY, constant.Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
-			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", infras),
+			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", choice.Items),
 		}
+
 		terminal.StartInteractiveTerminal(questions)
 
+		questionMap := make(map[string]string)
+
 		for _, q := range questions {
-			switch q.Key {
-			case constant.ProjectNameKEY:
-				projectName = q.Answer
-			case constant.ProjectDescriptionKEY:
-				projectDescription = q.Answer
-			case constant.AuthorKEY:
-				author = q.Answer
-			case constant.ProjectModuleNameKEY:
-				projectModuleName = q.Answer
-			case constant.GoVersionKEY:
-				goVersion = q.Answer
-			case constant.DirectoryKEY:
-				directory = q.Answer
-			}
+			questionMap[q.Key] = q.Answer
 			if q.Input.Exited() {
 				color.Redln("exited without completing...")
 				return
 			}
 		}
+
+		projectGen.Fill(questionMap)
+
 	} else {
-		projectName = args[0]
-		projectModuleName, _ = cmd.Flags().GetString("mod")
-		goVersion, _ = cmd.Flags().GetString("version")
-		directory, _ = cmd.Flags().GetString("dir")
+		projectGen.Name = args[0]
+		projectGen.ModuleName, _ = cmd.Flags().GetString("mod")
+		projectGen.GoVersion, _ = cmd.Flags().GetString("version")
+		projectGen.Directory, _ = cmd.Flags().GetString("dir")
 	}
 
-	goVersion = utility.CheckVersion(goVersion)
-	if projectName == "" {
-		color.Redln("Error: project name is required")
-		return
-	}
-	if projectModuleName == "" {
-		color.Redln("Error: golang module name is required")
+	if err := projectGen.Validate(); err != nil {
+		color.Redln(err.Error())
 		return
 	}
 
-	data := utility.GetModuleDataFromModuleName(projectName, projectModuleName, goVersion)
-	data.ProjectDescription = projectDescription
-	data.Author = author
-
-	data.Directory = directory
-	if data.Directory == "" {
-		data.Directory = filepath.Join(data.Directory, data.PackageName)
-	}
-	targetRoot := data.Directory
-
-	templatePath := utility.IgnoreWindowsPath(filepath.Join("templates", "wesionary", "project"))
-	err := utility.GenerateFiles(templates.FS, templatePath, targetRoot, data)
-	if err != nil {
-		color.Redln("Error generate file", err)
-		return
-	}
+	var selectedItems []int
 	for _, q := range questions {
-		switch q.Key {
-		case constant.InfrastructureNameKEY:
-			infrastructureModulePath := filepath.Join(data.PackageName, "pkg", "infrastructure", "module.go")
-			addInfrastructure(questions, infrasTmpl, infrastructureModulePath, data, true, templates.FS)
+		if q.Key == constant.InfrastructureNameKEY {
+			selected := q.Input.Selected()
+			for s := range selected {
+				selectedItems = append(selectedItems, s)
+			}
 		}
 	}
 
-	utility.PrintColorizeProjectDetail(data)
-	fmt.Println("")
+	if err := projectGen.Generate(selectedItems); err != nil {
+		color.Redln(err.Error())
+		return
+	}
+
 }

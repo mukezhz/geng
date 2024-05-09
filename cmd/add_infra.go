@@ -12,16 +12,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var serviceCmd = &cobra.Command{
-	Use:   "service add [name]",
-	Short: "Add a new Service",
+var infraCmd = &cobra.Command{
+	Use:   "infra add [name]",
+	Short: "Add a new infrastructure",
 	Args:  cobra.MaximumNArgs(2),
-	Run:   addServiceHandler,
+	Run:   addInfrastructureHandler,
 }
 
-var serviceGen = gen.ServiceGenerator{}
+var infraGen = gen.InfraGenerator{}
 
-func addServiceHandler(_ *cobra.Command, args []string) {
+func addInfrastructureHandler(_ *cobra.Command, args []string) {
 
 	if len(args) > 0 && !strings.Contains(args[0], "add") {
 		color.Redln("Error: invalid command")
@@ -35,7 +35,6 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 	}
 
 	data := utility.GetModuleDataFromModuleName("", projectModule.Module, projectModule.GoVersion)
-
 	currentDir, err := os.Getwd()
 	if err != nil {
 		color.Redln("Error getting current directory:", err)
@@ -48,11 +47,13 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 		return
 	}
 
-	serviceGen.Directory = projectPath
-	choice := serviceGen.GetChoices()
+	// generate in project path
+	infraGen.Directory = projectPath
+
+	choice := infraGen.GetChoices()
 
 	questions := []terminal.ProjectQuestion{
-		terminal.NewCheckboxQuestion(constant.ServiceNameKEY, "Select the Service? [<space> to select]", choice.Items),
+		terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select]", choice.Items),
 	}
 
 	terminal.StartInteractiveTerminal(questions)
@@ -66,19 +67,24 @@ func addServiceHandler(_ *cobra.Command, args []string) {
 	// get selected items from questions
 	var selectedItems []int
 	for _, q := range questions {
-		if q.Key == constant.ServiceNameKEY {
+		if q.Key == constant.InfrastructureNameKEY {
 			selected := q.Input.Selected()
 			for s := range selected {
 				selectedItems = append(selectedItems, s)
 			}
 		}
 	}
+	selected := infraGen.GetSelectedItems(selectedItems)
 
-	if err := serviceGen.Generate(data, selectedItems); err != nil {
+	if err := infraGen.Validate(); err != nil {
+		color.Red.Println(err)
+		return
+	}
+
+	if err := infraGen.Generate(data, selectedItems); err != nil {
 		color.Red.Printf("Generation error: %v\n", err)
 		return
 	}
 
-	selectedServices := serviceGen.GetSelectedItems(selectedItems)
-	utility.PrintColorizeServiceDetail(data, selectedServices)
+	utility.PrintColorizeInfrastructureDetail(data, selected)
 }
