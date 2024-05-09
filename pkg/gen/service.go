@@ -55,6 +55,24 @@ func (s *ServiceGenerator) GetChoices() *ServiceChoice {
 	return s.choice
 }
 
+// SimilarChoice gives similar choice to passed values from templates.
+// simple strings.Contain operation is carried out.
+func (s *ServiceGenerator) SimilarChoice(shouldMatch []string) []int {
+	var matches []int
+	choices := s.GetChoices()
+
+	for _, m := range shouldMatch {
+		for i, item := range choices.Items {
+      // similarity check for now
+			if strings.Contains(item, m) {
+				matches = append(matches, i)
+			}
+		}
+	}
+
+	return matches
+}
+
 func (s *ServiceGenerator) Generate(
 	data model.ModuleData,
 	selectedItems []int,
@@ -74,9 +92,12 @@ func (s *ServiceGenerator) Generate(
 	for _, index := range selectedItems {
 		funcPath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service", s.choice.Templates[index]))
 		funcs := utility.GetFunctionDeclarations(funcPath, templates.FS)
-		filteredServices := utility.Filter[string](funcs, func(q string) bool {
+
+		filterFunc := func(q string) bool {
 			return strings.Contains(q, "New")
-		})
+		}
+		filteredServices := utility.Filter[string](funcs, filterFunc)
+
 		functions = append(functions, filteredServices...)
 	}
 

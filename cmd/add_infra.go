@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/gookit/color"
@@ -10,7 +9,6 @@ import (
 	"github.com/mukezhz/geng/pkg/gen"
 	"github.com/mukezhz/geng/pkg/terminal"
 	"github.com/mukezhz/geng/pkg/utility"
-	"github.com/mukezhz/geng/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -76,6 +74,7 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 			}
 		}
 	}
+	selected := infraGen.GetSelectedItems(selectedItems)
 
 	if err := infraGen.Validate(); err != nil {
 		color.Red.Println(err)
@@ -87,23 +86,15 @@ func addInfrastructureHandler(_ *cobra.Command, args []string) {
 		return
 	}
 
-  // TODO: refactor service generation logic
-	var servicesTmpl []string
-	for _, item := range selectedItems {
-		currTemplate := choice.Templates[item]
-		fileName := strings.Replace(currTemplate, ".tmpl", "", 1)
-		serviceTemplatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "service"))
-		for _, file := range utility.ListDirectory(templates.FS, serviceTemplatePath) {
-			// weird logic for now
-			if strings.Contains(file, fileName) {
-				servicesTmpl = append(servicesTmpl, file)
-			}
-		}
+	serviceGen := gen.ServiceGenerator{
+		Directory: projectPath,
+	}
+	selectedItems = serviceGen.SimilarChoice(selected)
+
+	if err := serviceGen.Generate(data, selectedItems); err != nil {
+		color.Red.Printf("Generation error: %v\n", err)
+		return
 	}
 
-	serviceModulePath := filepath.Join(data.PackageName, "pkg", "services", "module.go")
-	addService(questions, servicesTmpl, serviceModulePath, data, true, templates.FS)
-
-	selected := infraGen.GetSelectedItems(selectedItems)
 	utility.PrintColorizeInfrastructureDetail(data, selected)
 }

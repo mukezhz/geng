@@ -18,7 +18,7 @@ func init() {
 		projectCmd,
 		runProjectCmd,
 		infraCmd,
-		addServiceCmd,
+		serviceCmd,
 		seedProjectCmd,
 		startProjectCmd,
 		migrationProjectCmd,
