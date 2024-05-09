@@ -94,7 +94,6 @@ func (g *InfraGenerator) Generate(
 	updatedCode := utility.AddListOfProvideInFxOptions(g.modPath, functions)
 	utility.WriteContentToPath(g.modPath, updatedCode)
 
-	// servicesTmplMap := make(map[string]bool)
 	for _, item := range selectedItems {
 		currTemplate := g.choice.Templates[item]
 		templatePath := filepath.Join(".", "templates", "wesionary", "infrastructure", currTemplate)
