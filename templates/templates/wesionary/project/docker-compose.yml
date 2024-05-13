@@ -14,5 +14,3 @@ services:
     container_name: {{.PackageName}}
     security_opt:
       - seccomp:unconfined
-    extra_hosts:
-      - "yc-api.local:192.168.64.2"
