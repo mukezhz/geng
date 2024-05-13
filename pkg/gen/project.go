@@ -59,10 +59,10 @@ func (p *ProjectGenerator) Generate(selectedInfra []int) error {
 		data.Directory = filepath.Join(data.Directory, data.PackageName)
 	}
 
-	targetRoot := data.Directory
+	p.Infra.Directory = data.Directory
 
 	templatePath := utility.IgnoreWindowsPath(filepath.Join("templates", "wesionary", "project"))
-	err := utility.GenerateFiles(templates.FS, templatePath, targetRoot, data)
+	err := utility.GenerateFiles(templates.FS, templatePath, p.Infra.Directory, data)
 	if err != nil {
 		return fmt.Errorf("Error generating file: %v", err)
 	}
