@@ -82,6 +82,7 @@ func generateModule(projectPath string, args []string, projectModule model.GoMod
 		return
 	}
 	data := utility.GetModuleDataFromModuleName(moduleName, projectModule.Module, projectModule.GoVersion)
+	data.IsModuleGenerated = true
 
 	targetRoot := filepath.Join(".", "domain", data.PackageName)
 	templatePath := utility.IgnoreWindowsPath(filepath.Join(".", "templates", "wesionary", "module"))

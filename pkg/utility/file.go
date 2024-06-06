@@ -98,6 +98,13 @@ func GenerateFiles(templatesFS embed.FS, templatePath string, targetRoot string,
 			dst = strings.Replace(dst, "hidden.", ".", 1)
 			// just copy the files to the target directory
 		}
+		if data.IsModuleGenerated {
+			dst = PrependStringInPath(dst, data.PackageName)
+			if strings.Contains(dst, "model.go") {
+				dst = strings.Replace(dst, data.PackageName, "models", 1)
+			}
+		}
+
 		GenerateFromEmbeddedTemplate(templatesFS, path, dst, data)
 
 		return nil
