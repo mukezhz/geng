@@ -1,0 +1,14 @@
+package hello
+
+import "{{.ProjectModuleName}}/domain/models"
+
+type Repository struct {
+}
+
+func NewRepository() *Repository {
+	return &Repository{}
+}
+
+func (s *Repository) GetMessage() models.HelloModel {
+	return models.HelloModel{Message: "Hello World"}
+}
