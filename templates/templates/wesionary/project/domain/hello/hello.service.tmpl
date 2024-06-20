@@ -1,5 +1,9 @@
 package hello
 
+import (
+	"{{.ProjectModuleName}}/domain/models"
+)
+
 // Service handles the business logic of the module
 type Service struct {
 	// Add any dependencies here
@@ -14,6 +18,6 @@ func NewService(repo *Repository) *Service {
 }
 
 // GetMessage returns a greeting message
-func (s *Service) GetMessage() Model {
+func (s *Service) GetMessage() models.HelloModel {
 	return s.repo.GetMessage()
 }

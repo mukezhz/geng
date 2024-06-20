@@ -1,5 +1,9 @@
 package {{.PackageName}}
 
+import (
+	"{{.ProjectModuleName}}/domain/models"
+)
+
 type Repository struct {
 }
 
@@ -7,6 +11,6 @@ func NewRepository() *Repository {
 	return &Repository{}
 }
 
-func (s *Repository) GetMessage() Model {
-	return Model{Message: "Hello World"}
+func (s *Repository) GetMessage() models.{{.ModuleName}}Model {
+	return models.{{.ModuleName}}Model{Message: "Hello World"}
 }

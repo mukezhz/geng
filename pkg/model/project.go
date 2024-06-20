@@ -9,6 +9,7 @@ type ModuleData struct {
 	ProjectDescription string
 	Author             string
 	Directory          string
+	IsModuleGenerated  bool
 }
 
 type GoMod struct {
