@@ -1,0 +1,10 @@
+{
+  "projectName": "haha",
+  "projectModuleName": "github.com/mukezhz/haha",
+  "author": "Mukesh Kumar Chaudhary <mukezhz@duck.com>",
+  "projectDescription": "A simple project",
+  "goVersion": "1.21"
+  // "directory": ".",
+  // "infrastructureName": [],
+  // "serviceName": []
+}

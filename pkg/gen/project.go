@@ -36,6 +36,27 @@ func (p *ProjectGenerator) Fill(d map[string]string) {
 	}
 }
 
+// FillProjectMetadataFromJson fills up project metadata from json file
+func (p *ProjectGenerator) FillProjectMetadataFromJson() {
+	data := utility.ReadJsonFile("geng.json")
+	for k, v := range data {
+		switch k {
+		case constant.ProjectNameKEY:
+			p.Name = v.(string)
+		case constant.ProjectModuleNameKEY:
+			p.ModuleName = v.(string)
+		case constant.AuthorKEY:
+			p.Author = v.(string)
+		case constant.ProjectDescriptionKEY:
+			p.Description = v.(string)
+		case constant.GoVersionKEY:
+			p.GoVersion = v.(string)
+		case constant.DirectoryKEY:
+			p.Directory = v.(string)
+		}
+	}
+}
+
 // Validate validates generated project arguments
 func (p *ProjectGenerator) Validate() error {
 	p.GoVersion = utility.CheckVersion(p.GoVersion)
