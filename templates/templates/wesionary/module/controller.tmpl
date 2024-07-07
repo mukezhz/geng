@@ -13,7 +13,7 @@ func NewController(service *Service) *Controller {
     return &Controller{service: service}
 }
 
-func (ctrl *Controller) HandleRoot(c *gin.Context) {
-    message := ctrl.service.GetMessage()
-    c.JSON(http.StatusOK, gin.H{"message": message.Message})
+func (c *Controller) HandleRoot(ctx *gin.Context) {
+    message := c.service.GetMessage()
+    ctx.JSON(http.StatusOK, gin.H{"message": message.Message})
 }

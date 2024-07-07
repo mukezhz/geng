@@ -3,7 +3,9 @@ package hello
 import (
     "net/http"
     "github.com/gin-gonic/gin"
+    "{{.ProjectModuleName}}/domain/dtos"
 )
+
 
 type Controller struct {
     service *Service
@@ -13,7 +15,8 @@ func NewController(service *Service) *Controller {
     return &Controller{service: service}
 }
 
-func (ctrl *Controller) HandleRoot(c *gin.Context) {
-    message := ctrl.service.GetMessage()
-    c.JSON(http.StatusOK, gin.H{"message": message.Message})
+func (c *Controller) HandleRoot(ctx *gin.Context) {
+    message := c.service.GetMessage()
+    res := dtos.HelloDTO{Message: message.Message}
+    ctx.JSON(http.StatusOK, gin.H{"data": res.Message})
 }
