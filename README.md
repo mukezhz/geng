@@ -67,7 +67,7 @@ geng gen module <module-name>
 - [ ] allow different template options when building project
 - [ ] generate test case template
 - [ ] generate hexagonal architecture
-- [ ] generate bruno api client
+- [ ] generate route, controller and dtos from bru file
 
 ### Diagrams
 
