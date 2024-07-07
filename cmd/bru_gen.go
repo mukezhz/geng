@@ -75,6 +75,7 @@ func WalkBruFiles(rootDir string) {
 
 			gen.AddRoute(b)
 			gen.AddController(b)
+			utility.PrintGenerationFromBrufile()
 
 		}
 		return nil
