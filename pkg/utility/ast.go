@@ -15,11 +15,11 @@ import (
 )
 
 func ImportPackage(node *ast.File, projectModule, packageName string) {
-	path := filepath.Join(projectModule, "domain", packageName)
+	importPath := filepath.Join(projectModule, "domain", packageName)
 	importSpec := &ast.ImportSpec{
 		Path: &ast.BasicLit{
 			Kind:  token.STRING,
-			Value: fmt.Sprintf(`"%v"`, path),
+			Value: fmt.Sprintf(`"%v"`, importPath),
 		},
 	}
 

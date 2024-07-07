@@ -18,8 +18,3 @@ func ReadJsonFile(path string) (r map[string]interface{}) {
 	}
 	return r
 }
-
-func FileExists(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
-}

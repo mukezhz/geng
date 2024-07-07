@@ -16,5 +16,5 @@ func NewRoute(router *infrastructure.Router, controller *Controller) *Route {
 
 func RegisterRoute(r *Route) {
   api := r.router.Group("/api")
-	r.groupRouter.GET("/{{.PackageName}}", r.controller.HandleRoot)
+	api.GET("/{{.PackageName}}", r.controller.HandleRoot)
 }

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
 	"github.com/mukezhz/geng/pkg/gen"
@@ -37,37 +35,7 @@ func createProject(cmd *cobra.Command, args []string) {
 	if utility.FileExists("geng.json") {
 		projectGen.FillProjectMetadataFromJson()
 	} else {
-		if len(args) == 0 {
-			questions = []terminal.ProjectQuestion{
-				terminal.NewShortQuestion(constant.ProjectNameKEY, constant.ProjectName+" *", "Enter Project Name:"),
-				terminal.NewShortQuestion(constant.ProjectModuleNameKEY, constant.ProjectModuleName+" *", "Enter Module Name:"),
-				terminal.NewShortQuestion(constant.AuthorKEY, constant.Author+" [Optional]", "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
-				terminal.NewLongQuestion(constant.ProjectDescriptionKEY, constant.ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
-				terminal.NewShortQuestion(constant.GoVersionKEY, constant.GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
-				terminal.NewShortQuestion(constant.DirectoryKEY, constant.Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
-				terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", choice.Items),
-			}
-
-			terminal.StartInteractiveTerminal(questions)
-
-			questionMap := make(map[string]string)
-
-			for _, q := range questions {
-				questionMap[q.Key] = q.Answer
-				if q.Input.Exited() {
-					color.Redln("exited without completing...")
-					return
-				}
-			}
-
-			projectGen.Fill(questionMap)
-
-		} else {
-			projectGen.Name = args[0]
-			projectGen.ModuleName, _ = cmd.Flags().GetString("mod")
-			projectGen.GoVersion, _ = cmd.Flags().GetString("version")
-			projectGen.Directory, _ = cmd.Flags().GetString("dir")
-		}
+		questions = getValueFromTerminal(args, questions, choice, cmd)
 	}
 
 	if err := projectGen.Validate(); err != nil {
@@ -84,10 +52,45 @@ func createProject(cmd *cobra.Command, args []string) {
 			}
 		}
 	}
-	log.Println(projectGen.Name, projectGen.ModuleName, projectGen.GoVersion, projectGen.Directory, selectedItems)
+
 	if err := projectGen.Generate(selectedItems); err != nil {
 		color.Redln(err.Error())
 		return
 	}
 
+}
+
+func getValueFromTerminal(args []string, questions []terminal.ProjectQuestion, choice *gen.InfraChoice, cmd *cobra.Command) []terminal.ProjectQuestion {
+	if len(args) == 0 {
+		questions = []terminal.ProjectQuestion{
+			terminal.NewShortQuestion(constant.ProjectNameKEY, constant.ProjectName+" *", "Enter Project Name:"),
+			terminal.NewShortQuestion(constant.ProjectModuleNameKEY, constant.ProjectModuleName+" *", "Enter Module Name:"),
+			terminal.NewShortQuestion(constant.AuthorKEY, constant.Author+" [Optional]", "Enter Author Detail[Mukesh Chaudhary <mukezhz@duck.com>] [Optional]"),
+			terminal.NewLongQuestion(constant.ProjectDescriptionKEY, constant.ProjectDescription+" [Optional]", "Enter Project Description [Optional]"),
+			terminal.NewShortQuestion(constant.GoVersionKEY, constant.GoVersion+" [Optional]", "Enter Go Version (Default: 1.20) [Optional]"),
+			terminal.NewShortQuestion(constant.DirectoryKEY, constant.Directory+" [Optional]", "Enter Project Directory (Default: package_name) [Optional]"),
+			terminal.NewCheckboxQuestion(constant.InfrastructureNameKEY, "Select the infrastructure? [<space> to select] [Optional]", choice.Items),
+		}
+
+		terminal.StartInteractiveTerminal(questions)
+
+		questionMap := make(map[string]string)
+
+		for _, q := range questions {
+			questionMap[q.Key] = q.Answer
+			if q.Input.Exited() {
+				color.Redln("exited without completing...")
+				return nil
+			}
+		}
+
+		projectGen.Fill(questionMap)
+
+	} else {
+		projectGen.Name = args[0]
+		projectGen.ModuleName, _ = cmd.Flags().GetString("mod")
+		projectGen.GoVersion, _ = cmd.Flags().GetString("version")
+		projectGen.Directory, _ = cmd.Flags().GetString("dir")
+	}
+	return questions
 }

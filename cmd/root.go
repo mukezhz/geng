@@ -22,5 +22,6 @@ func init() {
 		seedProjectCmd,
 		startProjectCmd,
 		migrationProjectCmd,
+		bruCmd,
 	)
 }

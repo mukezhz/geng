@@ -216,3 +216,21 @@ func GetModuleNameFromGoModFile() (model.GoMod, error) {
 
 	return goMod, nil
 }
+
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
+func GetModuleNameFromPath(path string) string {
+	if path == "/" {
+		return ""
+	}
+	l := len(path)
+	m := strings.Split(path, "/")
+	if l == 0 || len(m) == 0 {
+		return ""
+	}
+
+	return m[len(m)-2]
+}

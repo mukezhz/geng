@@ -85,7 +85,7 @@ func (p *ProjectGenerator) Generate(selectedInfra []int) error {
 	templatePath := utility.IgnoreWindowsPath(filepath.Join("templates", "wesionary", "project"))
 	err := utility.GenerateFiles(templates.FS, templatePath, p.Infra.Directory, data)
 	if err != nil {
-		return fmt.Errorf("Error generating file: %v", err)
+		return fmt.Errorf("error generating file: %v", err)
 	}
 
 	utility.PrintColorizeProjectDetail(data)
@@ -96,12 +96,12 @@ func (p *ProjectGenerator) Generate(selectedInfra []int) error {
 	}
 
 	if len(selectedInfra) == 0 {
-		return errors.New("No infrastructure selected")
+		return errors.New("no infrastructure selected")
 	}
 
 	selectedInfras := p.Infra.GetSelectedItems(selectedInfra)
 	if err := p.Infra.Generate(data, selectedInfra); err != nil {
-		return fmt.Errorf("Generation error: %v\n", err)
+		return fmt.Errorf("generation error: %v", err)
 	}
 
 	utility.PrintColorizeInfrastructureDetail(data, selectedInfras)

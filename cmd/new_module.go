@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/gookit/color"
@@ -35,28 +33,22 @@ func generate(_ *cobra.Command, args []string) {
 	if len(args) == 0 {
 		args = append(args, "module")
 	}
-	projectModule, err := utility.GetModuleNameFromGoModFile()
-	if err != nil {
-		fmt.Println("Error finding Module name from go.mod:", err)
+
+	projectPath, projectModule := getProjectPath()
+	if projectModule == nil || projectPath == "" {
 		return
 	}
-	currentDir, err := os.Getwd()
-	if err != nil {
-		color.Redln("Error getting current directory:", err)
-		panic(err)
-	}
-	projectPath, err := utility.FindGitRoot(currentDir)
-	if err != nil {
-		fmt.Println("Error finding Git root:", err)
+	mainModulePath := filepath.Join(projectPath, "domain", "module.go")
+	if !utility.FileExists(mainModulePath) {
+		color.Redln("Error: module.go not found")
 		return
 	}
 	// Define the directory structure
-	generateModule(projectPath, args, projectModule)
+	generateModule(mainModulePath, args, *projectModule)
 
 }
 
-func generateModule(projectPath string, args []string, projectModule model.GoMod) {
-	mainModulePath := filepath.Join(projectPath, "domain", "module.go")
+func generateModule(mainModulePath string, args []string, projectModule model.GoMod) {
 	var moduleName string
 	if len(args) == 1 {
 		questions := []terminal.ProjectQuestion{
