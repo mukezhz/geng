@@ -73,7 +73,9 @@ geng gen module <module-name>
 
 <img width="457" alt="image" src="https://github.com/mukezhz/geng/assets/43813670/a0b11d39-e077-4038-852f-7b5b0adb27c8">
 
+### Logo
 
+<img width="45" alt="image" src="https://github.com/mukezhz/geng/assets/43813670/da07d8cc-8896-4a13-9b31-099958e65cb4">
 
 
 
