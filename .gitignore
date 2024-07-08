@@ -148,3 +148,7 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+
+docs/.vitepress/dist/*
+docs/.vitepress/cache/*
+node_modules/*
