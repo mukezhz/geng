@@ -9,7 +9,6 @@ import (
 
 	"github.com/gookit/color"
 	"github.com/mukezhz/bru-go/bru"
-	"github.com/mukezhz/bru-go/parser"
 	"github.com/mukezhz/geng/pkg/gen"
 	"github.com/mukezhz/geng/pkg/model"
 	"github.com/mukezhz/geng/pkg/utility"
@@ -38,23 +37,23 @@ func WalkBruFiles(rootDir string) {
 			if err != nil {
 				return err
 			}
-			tokens := bru.GetTokens(string(content))
-			ast := bru.GetAST(tokens)
-			m := utility.GetModuleNameFromPath(path)
-			httpNode := bru.GetTagNode[parser.HTTPNode](ast)
-			metaNode := bru.GetTagNode[parser.MetaNode](ast)
-			b := model.BruModel{
-				Route:       utility.SanitizeEndpoint(httpNode.URL),
-				Method:      strings.ToUpper(httpNode.Method),
-				Body:        httpNode.Body,
-				Handler:     utility.ToPasalCase(metaNode.Name),
-				ModuleName:  m,
-				Name:        metaNode.Name,
-				Description: metaNode.Name,
+			bru, err := bru.Unmarshal(content)
+			if err != nil {
+				return err
 			}
 
-			if !utility.FileExists("domain/" + m) {
+			m := utility.GetModuleNameFromPath(path)
+			b := model.BruModel{
+				Route:       utility.SanitizeEndpoint(bru.HTTP.URL),
+				Method:      strings.ToUpper(bru.HTTP.Method),
+				Body:        bru.Body.Content,
+				Handler:     utility.ToPasalCase(bru.Meta.Name),
+				ModuleName:  m,
+				Name:        bru.Meta.Name,
+				Description: bru.Meta.Name,
+			}
 
+			if !utility.FileExists(filepath.Join("domain", m)) {
 				projectPath, projectModule := getProjectPath()
 				if projectModule == nil || projectPath == "" {
 					return nil
