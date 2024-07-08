@@ -1,5 +1,7 @@
 ---
 outline: deep
+title: Gen-G | Roadmap
+description: Roadmap of the tool GenG
 ---
 
 # Roadmap
