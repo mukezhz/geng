@@ -15,11 +15,11 @@ hero:
       link: /roadmap
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Generate Go Project
+    details: Gen-G will help you to generate a starter for go gin project
+  - title: Generate a module
+    details: Gen-G will help you to generate module which will setup DI
+  - title: Generate from bru file
+    details: Gen-G will help you to generate module from Bru file
 ---
 

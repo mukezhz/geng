@@ -2,6 +2,7 @@ import { defineConfig, HeadConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+
   title: "GENG",
   description: "A tool to generate golang web project.",
   themeConfig: {
@@ -25,7 +26,15 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: "How to use?", link: "/how-to-use" },
-          // { text: "Getting Started", link: "/getting-started" },
+          { text: "Generate a project", link: "/generate-project" },
+          { text: "Generate a project using config", link: "/generate-project-config" },
+          { text: "Start the project", link: "/start-project" },
+          { text: "Project Folder structure", link: "/folder-structure" },
+          { text: "Generate a module", link: "/generate-module" },
+          {
+            text: "Generate a infrastructure",
+            link: "/generate-infrastructure",
+          },
         ],
       },
       {
