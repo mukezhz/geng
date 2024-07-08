@@ -1,5 +1,7 @@
 ---
 outline: deep
+title: getting started of geng
+description: learn how to install geng in detail.
 ---
 
 # Getting Started

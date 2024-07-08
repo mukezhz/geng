@@ -1,4 +1,4 @@
-import { defineConfig } from "vitepress";
+import { defineConfig, HeadConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -31,17 +31,34 @@ export default defineConfig({
       {
         text: "Task",
         collapsed: false,
-        items: [
-          { text: "Roadmap", link: "/roadmap" },
-        ],
+        items: [{ text: "Roadmap", link: "/roadmap" }],
       },
     ],
 
-    socialLinks: [
-      { icon: "github", link: "https://github.com/mukezhz/geng" },
-    ],
+    socialLinks: [{ icon: "github", link: "https://github.com/mukezhz/geng" }],
     search: {
       provider: "local",
     },
+  },
+  transformHead: ({ pageData }) => {
+    const head: HeadConfig[] = [];
+    const title = pageData.frontmatter.title || "GenG";
+    const description =
+      pageData.frontmatter.description ||
+      "GENG - A tool to generate golang web project.";
+    const ogImage =
+      pageData.frontmatter.ogImage ||
+      "https://github.com/mukezhz/geng/assets/43813670/da07d8cc-8896-4a13-9b31-099958e65cb4";
+
+    head.push(["meta", { property: "og:title", content: title }]);
+    head.push(["meta", { property: "og:description", content: description }]);
+    head.push(["meta", { property: "og:image", content: ogImage }]);
+
+    head.push(["meta", { name: "twitter:card", content: "geng" }]);
+    head.push(["meta", { name: "twitter:image", content: ogImage }]);
+    head.push(["meta", { name: "twitter:title", content: title }]);
+    head.push(["meta", { name: "twitter:description", content: description }]);
+
+    return head;
   },
 });
