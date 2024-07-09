@@ -6,6 +6,9 @@ hero:
   name: "GENerate Golang Project"
   text: "A tool to generate golang web project."
   tagline: Effortlessly Kickstart Your Golang Web Projects
+  image:
+    src: /geng.webp
+    alt: Gen-G
   actions:
     - theme: brand
       text: Getting started
@@ -21,5 +24,5 @@ features:
     details: Gen-G will help you to generate module which will setup DI
   - title: Generate from bru file
     details: Gen-G will help you to generate module from Bru file
+pageClass: logo-css
 ---
-
