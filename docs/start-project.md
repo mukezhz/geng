@@ -4,9 +4,9 @@ title: Start a project
 description: Let's learn how to execute a project using Gen-G
 ---
 
-# How to use?
+# Start the project
 
-## Start the project
+## Let's start
 
 In order to start a project just follow the given instruction which has been printed on project generation step.
 
@@ -66,7 +66,7 @@ Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-
 2024-07-08T14:42:08.002Z        INFO    [GIN-debug] Listening and serving HTTP on :5000
 ```
 
-### Info
+### Run
 
 Once you follow all the step correctly you can see your app running at port **:5000**
 

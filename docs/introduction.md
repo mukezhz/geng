@@ -4,7 +4,7 @@ title: Gen-G | Generate Golang Project
 description: a command line tool that helps you to initialize, develop and maintain your Go gin applications
 ---
 
-# What is GenG
+# What is GenG?
 
 ## Introduction
 

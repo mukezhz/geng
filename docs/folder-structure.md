@@ -4,9 +4,9 @@ title: Start a project
 description: Let's learn how to execute a project using Gen-G
 ---
 
-# How to use?
+# Folder Structure of the project
 
-## Folder Structure of the project
+## Tree of folder structure
 
 ```bash
 .

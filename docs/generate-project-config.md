@@ -4,9 +4,9 @@ title: Scaffold a project
 description: Let's learn how to generate a project using Gen-G
 ---
 
-# How to use?
+# Generate a project using config
 
-## Generate a project using config
+## Let's start
 
 Instead of using the following command.
 ```bash

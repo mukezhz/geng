@@ -4,9 +4,9 @@ title: Scaffold a project
 description: Let's learn how to generate a project using Gen-G
 ---
 
-# How to use?
+# Generate a project using interactive terminal
 
-## Generate a project
+## Let's start
 
 In order to generate a project you need to enter the following command:
 ```bash

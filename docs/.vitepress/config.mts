@@ -18,7 +18,7 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: "What is Geng?", link: "/introduction" },
-          { text: "Getting Started.", link: "/getting-started" },
+          { text: "Getting Started", link: "/getting-started" },
         ],
       },
       {
