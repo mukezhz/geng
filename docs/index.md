@@ -9,6 +9,7 @@ hero:
   image:
     src: /geng.webp
     alt: Gen-G
+    id: geng-brand-logo
   actions:
     - theme: brand
       text: Getting started
