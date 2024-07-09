@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "GENerator Golang Project"
+  name: "GENerate Golang Project"
   text: "A tool to generate golang web project."
   tagline: Effortlessly Kickstart Your Golang Web Projects
   actions:
