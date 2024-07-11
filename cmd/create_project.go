@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/gookit/color"
 	"github.com/mukezhz/geng/pkg/constant"
 	"github.com/mukezhz/geng/pkg/gen"
@@ -84,7 +82,7 @@ func createProject(cmd *cobra.Command, args []string) {
 			}
 		}
 	}
-	log.Println(projectGen.Name, projectGen.ModuleName, projectGen.GoVersion, projectGen.Directory, selectedItems)
+
 	if err := projectGen.Generate(selectedItems); err != nil {
 		color.Redln(err.Error())
 		return
